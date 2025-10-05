@@ -1,0 +1,9 @@
+# FastAPI 核心
+fastapi
+
+# ASGI 伺服器，用於執行 FastAPI
+uvicorn[standard]
+
+# 若未來需要與前端跨域溝通，會需要此套件
+python-multipart
+fastapi-cors

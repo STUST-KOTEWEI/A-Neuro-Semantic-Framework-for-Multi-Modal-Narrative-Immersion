@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Project-HOLO</string>
+    <string name="title_activity_main">Project-HOLO</string>
+    <string name="package_name">com.stust.kotewei.projectholo</string>
+    <string name="custom_url_scheme">com.stust.kotewei.projectholo</string>
+</resources>
