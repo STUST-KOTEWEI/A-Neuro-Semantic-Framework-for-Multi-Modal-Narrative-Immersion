@@ -9,6 +9,38 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
+  const [audioSrc, setAudioSrc] = useState('');
+  const [ttsLoading, setTtsLoading] = useState(false);
+
+  const handleTTS = async () => {
+    if (!text.trim()) {
+      setError('請輸入要轉換為語音的文字');
+      return;
+    }
+    setTtsLoading(true);
+    setError('');
+    setAudioSrc('');
+
+    try {
+        const response = await fetch(`${API_URL}/tts`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, lang: 'zh-tw' })
+        });
+
+        if (!response.ok) {
+            throw new Error(`TTS API 請求失敗，狀態碼: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        setAudioSrc(url);
+    } catch (err) {
+        setError(err.message);
+    } finally {
+        setTtsLoading(false);
+    }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -62,9 +94,21 @@ function App() {
           <button type="submit" disabled={loading}>
             {loading ? '生成中...' : '生成沉浸式體驗'}
           </button>
+          <button type="button" onClick={handleTTS} disabled={ttsLoading}>
+            {ttsLoading ? '語音生成中...' : '播放語音'}
+          </button>
         </form>
 
         {error && <p className="error-message">{error}</p>}
+
+        {audioSrc && (
+          <div className="audio-player">
+            <h3>語音輸出</h3>
+            <audio controls autoPlay src={audioSrc}>
+              您的瀏覽器不支援音訊播放。
+            </audio>
+          </div>
+        )}
 
         {result && (
           <div className="result-container">

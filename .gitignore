@@ -30,3 +30,9 @@ build/
 # OS specific
 .DS_Store
 Thumbs.db
+
+# Log files
+*.log
+
+# Media files
+*.mp3
