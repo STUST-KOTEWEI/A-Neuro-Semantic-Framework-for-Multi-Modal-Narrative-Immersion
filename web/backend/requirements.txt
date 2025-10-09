@@ -7,3 +7,6 @@ uvicorn[standard]
 # 若未來需要與前端跨域溝通，會需要此套件
 python-multipart
 fastapi-cors
+
+# Text-to-Speech
+gTTS

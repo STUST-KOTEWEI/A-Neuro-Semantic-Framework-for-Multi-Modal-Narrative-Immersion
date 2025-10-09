@@ -83,3 +83,25 @@ async def generate_immersion(request: NarrativeRequest):
     )
 
 # 若要直接執行此檔案進行測試: uvicorn main:app --reload
+
+from fastapi import Response
+from gtts import gTTS
+import io
+
+class TTSRequest(BaseModel):
+    text: str
+    lang: str = 'en'
+
+@app.post("/tts", summary="Text-to-Speech", description="Converts text to speech and returns an audio file.")
+async def text_to_speech(request: TTSRequest):
+    """
+    Converts text to speech.
+
+    - **text**: The text to convert.
+    - **lang**: The language of the text.
+    """
+    tts = gTTS(text=request.text, lang=request.lang)
+    fp = io.BytesIO()
+    tts.write_to_fp(fp)
+    fp.seek(0)
+    return Response(fp.read(), media_type="audio/mpeg")
