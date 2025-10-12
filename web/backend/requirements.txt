@@ -10,3 +10,12 @@ fastapi-cors
 
 # Text-to-Speech
 gTTS
+
+# 影像識別與 OCR
+google-cloud-vision
+paddleocr
+opencv-python
+numpy
+
+# 生成式 AI
+openai
