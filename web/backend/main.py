@@ -8,8 +8,8 @@ from typing import Dict, Any, List
 # 將專案根目錄加入 Python 路徑，以便引用 holo 模組
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-# 這裡可以匯入您 holo 專案的核心功能
-# from holo.main import HoloProcessor # 假設這是您的主要處理類別
+# Import the orchestrator
+from holo.orchestrator import Orchestrator
 
 app = FastAPI(
     title="Project-HOLO API",
@@ -33,8 +33,19 @@ app.add_middleware(
 )
 
 
-# 建立一個處理器實例 (請根據您的實際架構調整)
-# processor = HoloProcessor()
+# Initialize the orchestrator
+orchestrator_config = {
+    'connectors': {
+        'textPreprocessor': {'type': 'http', 'url': 'https://your-backend/api/preprocess'},
+        'vectorDB': {'type': 'pinecone', 'index': 'user_sessions'},
+        'emotionModelAPI': {'type': 'http', 'url': 'https://your-backend/api/emotion/predict'},
+        'TTS': {'type': 'http', 'url': 'https://api.elevenlabs.io/v1/text-to-speech'},
+        'bhapticsSDK': {'type': 'http', 'url': 'https://your-backend/api/device/haptics'},
+        'aromajoinAPI': {'type': 'http', 'url': 'https://your-backend/api/device/scent'},
+        'postgres': {'type': 'sql', 'connection': 'postgres://...'}
+    }
+}
+orchestrator = Orchestrator(orchestrator_config)
 
 
 class NarrativeRequest(BaseModel):
@@ -105,3 +116,97 @@ async def text_to_speech(request: TTSRequest):
     tts.write_to_fp(fp)
     fp.seek(0)
     return Response(fp.read(), media_type="audio/mpeg")
+
+
+# ========== Orchestrator Endpoints ==========
+
+class PlayRequest(BaseModel):
+    text: str
+    user_id: str = "default"
+
+
+class PlayResponse(BaseModel):
+    playback_url: str
+    metadata: Dict[str, Any]
+
+
+@app.post("/orchestrator/play", response_model=PlayResponse, summary="開始播放", description="開始播放文本並生成多感官體驗")
+async def orchestrator_play(request: PlayRequest):
+    """
+    Start playback of text with multisensory experience.
+    
+    - **text**: The text content to play
+    - **user_id**: User identifier for preferences
+    """
+    result = await orchestrator.play(request.text, request.user_id)
+    
+    if 'error' in result:
+        return {"playback_url": "", "metadata": {"error": result['error']}}
+    
+    return result
+
+
+class PauseResponse(BaseModel):
+    status: str
+    current_segment: int
+    is_playing: bool
+
+
+@app.post("/orchestrator/pause", response_model=PauseResponse, summary="暫停播放", description="暫停當前播放")
+async def orchestrator_pause():
+    """
+    Pause current playback.
+    """
+    result = await orchestrator.pause()
+    return result
+
+
+class SeekRequest(BaseModel):
+    segment_index: int
+
+
+class SeekResponse(BaseModel):
+    status: str
+    current_segment: int
+    playback_url: str
+    segment_text: str
+    segment_duration: float
+
+
+@app.post("/orchestrator/seek", response_model=SeekResponse, summary="跳轉到段落", description="跳轉到指定的文本段落")
+async def orchestrator_seek(request: SeekRequest):
+    """
+    Seek to a specific segment.
+    
+    - **segment_index**: Index of the segment to seek to
+    """
+    result = await orchestrator.seek(request.segment_index)
+    
+    if 'error' in result:
+        return {
+            "status": "error",
+            "current_segment": result.get('current_segment', 0),
+            "playback_url": "",
+            "segment_text": "",
+            "segment_duration": 0.0
+        }
+    
+    return result
+
+
+class SummaryResponse(BaseModel):
+    summary: str
+    total_segments: int
+    total_highlights: int
+    emotion: str
+    current_position: int
+    is_playing: bool
+
+
+@app.get("/orchestrator/summary", response_model=SummaryResponse, summary="獲取摘要", description="獲取當前會話的摘要信息")
+async def orchestrator_summary():
+    """
+    Get summary of current session.
+    """
+    result = await orchestrator.summary()
+    return result
