@@ -36,3 +36,9 @@ Thumbs.db
 
 # Media files
 *.mp3
+
+# CoreML models (for testing)
+*.mlpackage
+*.mlmodelc
+dummy_emotion_model.pt
+TestEmotionLSTM.mlpackage
