@@ -2,7 +2,7 @@
 書籍資料擴充器
 使用Open Library API等外部資源擴充書籍資訊
 """
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 
 class BookDataEnricher:
