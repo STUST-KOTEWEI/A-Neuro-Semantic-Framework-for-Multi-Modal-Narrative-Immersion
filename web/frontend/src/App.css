@@ -135,3 +135,88 @@ pre {
   word-wrap: break-word;
   color: #f0f0f0;
 }
+
+/* Tabs styling */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem auto;
+  max-width: 800px;
+  border-bottom: 2px solid #444;
+  padding: 0 2rem;
+}
+
+.tab {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: #a0a0a0;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.tab:hover {
+  color: #f0f0f0;
+  border-bottom-color: #646cff;
+}
+
+.tab.active {
+  color: #f0f0f0;
+  border-bottom-color: #646cff;
+}
+
+/* Status button */
+.status-btn {
+  margin-top: 1rem;
+  background-color: #646cff;
+  border: none;
+}
+
+.status-btn:hover {
+  background-color: #535bf2;
+}
+
+/* Scan section */
+.scan-section {
+  width: 100%;
+  max-width: 800px;
+  text-align: center;
+}
+
+.upload-area {
+  margin: 2rem 0;
+  padding: 2rem;
+  border: 2px dashed #555;
+  border-radius: 8px;
+  background-color: #1e1e1e;
+}
+
+.upload-area input[type="file"] {
+  width: 100%;
+  padding: 0.8rem;
+  cursor: pointer;
+}
+
+/* Status section */
+.status-section {
+  width: 100%;
+  max-width: 800px;
+  text-align: center;
+}
+
+/* Audio player */
+.audio-player {
+  width: 100%;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #1e1e1e;
+  border-radius: 8px;
+}
+
+.audio-player audio {
+  width: 100%;
+  margin-top: 1rem;
+}
