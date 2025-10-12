@@ -8,3 +8,11 @@ flake8
 
 # 測試框架
 pytest
+
+# CoreML 模型轉換
+coremltools
+
+# 深度學習框架 (用於模型轉換)
+# 根據需求選擇安裝：
+# - PyTorch: pip install torch
+# - TensorFlow: pip install tensorflow
