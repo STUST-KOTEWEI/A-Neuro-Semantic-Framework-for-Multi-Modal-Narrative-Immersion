@@ -1,0 +1,14 @@
+# CoreML 模型轉換所需的套件
+# 安裝指令: pip install -r requirements-model-conversion.txt
+
+# CoreML 轉換工具
+coremltools>=7.0
+
+# 可選: 如果要轉換 TensorFlow/Keras 模型
+# tensorflow>=2.12.0
+
+# 可選: 如果要轉換 PyTorch 模型
+# torch>=2.0.0
+
+# 輔助套件
+numpy>=1.24.0
