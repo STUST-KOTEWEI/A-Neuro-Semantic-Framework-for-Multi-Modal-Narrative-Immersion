@@ -10,3 +10,6 @@ fastapi-cors
 
 # Text-to-Speech
 gTTS
+
+# HTTP client for connectors
+httpx
