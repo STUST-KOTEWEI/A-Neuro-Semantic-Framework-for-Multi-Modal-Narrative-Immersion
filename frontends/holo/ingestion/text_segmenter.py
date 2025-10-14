@@ -38,8 +38,8 @@ class TextSegmenter:
         Returns:
             List of text segments with metadata
         """
-        # Simple sentence detection using punctuation
-        sentences = re.split(r'([.!?]+)', text)
+        # Enhanced sentence detection for both English and Chinese punctuation
+        sentences = re.split(r'([.!?。！？]+)', text)
         segments: List[Dict[str, Any]] = []
         current_chunk = ""
         current_index = 0

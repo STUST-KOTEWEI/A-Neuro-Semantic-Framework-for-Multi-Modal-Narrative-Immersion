@@ -1,0 +1,9 @@
+pyproject.toml
+src/UNKNOWN.egg-info/PKG-INFO
+src/UNKNOWN.egg-info/SOURCES.txt
+src/UNKNOWN.egg-info/dependency_links.txt
+src/UNKNOWN.egg-info/top_level.txt
+tests/test_elevenlabs_tts.py
+tests/test_haptics_emulator.py
+tests/test_integration_e2e.py
+tests/test_text_segmenter.py

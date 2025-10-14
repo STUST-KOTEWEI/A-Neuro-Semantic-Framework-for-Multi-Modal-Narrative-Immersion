@@ -1,7 +1,5 @@
 # 修復型別註釋問題的腳本
-import re
 import os
-from pathlib import Path
 
 def fix_type_annotations():
     """修復專案中的型別註釋問題"""
