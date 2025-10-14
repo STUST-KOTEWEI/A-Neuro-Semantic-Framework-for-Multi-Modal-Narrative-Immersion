@@ -1,0 +1,49 @@
+orchestrator:
+  responsibilities:
+    - Coordinates the overall workflow
+    - Manages the sequence of execution
+  tools:
+    - Workflow management tool
+  sequence:
+    - Initialize workflow
+    - Trigger modules in order
+
+reader:
+  responsibilities:
+    - Reads input data
+    - Preprocesses data for further analysis
+  tools:
+    - Data ingestion tool
+  sequence:
+    - Receive input
+    - Clean and format data
+
+emotion:
+  responsibilities:
+    - Analyzes emotional context of the input
+    - Provides emotional feedback to orchestrator
+  tools:
+    - Emotional analysis tool
+  sequence:
+    - Receive data from reader
+    - Analyze and return results
+
+device:
+  responsibilities:
+    - Interacts with user devices
+    - Sends and receives signals
+  tools:
+    - Device communication tool
+  sequence:
+    - Connect with user device
+    - Relay information to and from orchestrator
+
+memory:
+  responsibilities:
+    - Stores state and context of the workflow
+    - Provides historical data for analysis
+  tools:
+    - Database or storage solution
+  sequence:
+    - Save current state
+    - Retrieve historical data as needed
