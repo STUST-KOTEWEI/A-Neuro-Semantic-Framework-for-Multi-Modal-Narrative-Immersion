@@ -36,3 +36,8 @@ Thumbs.db
 
 # Media files
 *.mp3
+
+# CoreML models (large files, generated from conversion)
+*.mlpackage
+*.mlmodel
+*.mlmodelc
