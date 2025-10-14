@@ -1,13 +1,7 @@
 {
-  "devDependencies": {
-    "@capacitor/cli": "^7.4.3"
-  },
   "dependencies": {
-    "@genkit-ai/firebase": "^1.21.0",
     "@genkit-ai/googleai": "^1.21.0",
-    "dotenv": "^17.2.3",
-    "firebase": "^12.4.0",
     "genkit": "^1.21.0",
-    "node-fetch": "^3.3.2"
+    "openai": "^6.3.0"
   }
 }
