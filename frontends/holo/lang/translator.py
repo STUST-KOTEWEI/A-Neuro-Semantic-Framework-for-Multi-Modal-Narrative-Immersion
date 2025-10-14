@@ -3,6 +3,7 @@
 
 from typing import Dict
 
+
 class Translator:
     def __init__(self, target_language: str):
         self.target_language = target_language
