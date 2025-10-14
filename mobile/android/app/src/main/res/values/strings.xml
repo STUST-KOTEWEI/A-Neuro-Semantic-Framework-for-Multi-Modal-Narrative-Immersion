@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">AI Reader</string>
+    <string name="title_activity_main">AI Reader</string>
+    <string name="package_name">com.stust.ai_reader</string>
+    <string name="custom_url_scheme">com.stust.ai_reader</string>
+</resources>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "415768273929",
+    "project_id": "aireader-tewei-ko",
+    "storage_bucket": "aireader-tewei-ko.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:415768273929:android:ec436fa107c9a5a513c4d8",
+        "android_client_info": {
+          "package_name": "AI_Reader.v1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC02jtXlADOmgn6zpPCjk6knSiWzOuKnh0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

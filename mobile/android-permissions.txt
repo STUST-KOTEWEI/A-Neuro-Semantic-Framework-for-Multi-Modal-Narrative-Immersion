@@ -1,0 +1,9 @@
+在 Android 專案 (android/app/src/main/AndroidManifest.xml) 建議加入：
+
+<uses-permission android:name="android.permission.CAMERA" />
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+若需在 Android 9+ 使用 HTTP，請在 <application> 標籤設定：
+android:usesCleartextTraffic="false" （建議使用 HTTPS，不開啟明文流量）。

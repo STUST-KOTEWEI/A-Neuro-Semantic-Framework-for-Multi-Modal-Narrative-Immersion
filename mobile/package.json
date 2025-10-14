@@ -1,0 +1,27 @@
+{
+  "name": "ai-reader-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Capacitor wrapper for AI Reader web app",
+  "scripts": {
+    "postinstall": "cap sync",
+    "sync": "cap sync",
+    "patch:perms": "node ./scripts/patch-permissions.mjs && cap copy",
+    "open:ios": "cap open ios",
+    "open:android": "cap open android",
+    "copy": "cap copy",
+    "clean": "rimraf ios android",
+    "fmt": "prettier --write web/**/*.html"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.0",
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/ios": "^6.2.0"
+  }
+}
