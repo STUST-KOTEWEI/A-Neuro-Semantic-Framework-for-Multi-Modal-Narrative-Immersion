@@ -1,17 +1,20 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-from fastapi.middleware.cors import CORSMiddleware
 import sys
 import os
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 # 將專案根目錄加入 Python 路徑，以便引用 holo 模組
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.append(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 
 # Import Week 1 Sprint features
-from holo.ingestion.text_segmenter import TextSegmenter
-from holo.auditory.elevenlabs_tts import get_tts_engine
-from holo.sensory.haptics_emulator import HapticsEmulator
+from holo.ingestion.text_segmenter import TextSegmenter  # noqa: E402
+from holo.auditory.elevenlabs_tts import get_tts_engine  # noqa: E402
+from holo.sensory.haptics_emulator import HapticsEmulator  # noqa: E402
+
+from fastapi import FastAPI, Response  # noqa: E402
+from pydantic import BaseModel  # noqa: E402
+from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 
 app = FastAPI(
     title="Project-HOLO API",
@@ -56,7 +59,13 @@ class ImmersionResponse(BaseModel):
 async def read_root():
     return {"message": "歡迎使用 Project-HOLO API"}
 
-@app.post("/generate_immersion", response_model=ImmersionResponse, summary="生成沉浸式體驗", description="輸入敘事文本，生成對應的聽覺、感官與知識圖譜輸出")
+
+@app.post(
+    "/generate_immersion",
+    response_model=ImmersionResponse,
+    summary="生成沉浸式體驗",
+    description="輸入敘事文本，生成對應的聽覺、感官與知識圖譜輸出",
+)
 async def generate_immersion(request: NarrativeRequest):
     """
     接收一段敘事文本，並回傳一個多模態的沉浸式體驗資料。
@@ -67,26 +76,30 @@ async def generate_immersion(request: NarrativeRequest):
     # Use Week 1 Sprint features: text segmentation and haptics
     segments_data = text_segmenter.get_segments_with_metadata(request.text)
     haptic_pattern = haptics_emulator.generate_from_text(request.text)
-    
+
     # Build auditory output with TTS info
     auditory_data = {
-        "tts_engine": "ElevenLabs" if not hasattr(tts_engine, 'is_fallback') else "gTTS (fallback)",
+        "tts_engine": (
+            "ElevenLabs"
+            if not hasattr(tts_engine, "is_fallback")
+            else "gTTS (fallback)"
+        ),
         "segments": segments_data["total_segments"],
-        "available_voices": tts_engine.get_available_voices()
+        "available_voices": tts_engine.get_available_voices(),
     }
-    
+
     # Build sensory output with haptics
     sensory_data = {
         "haptic_pattern": haptic_pattern,
         "haptic_events_count": len(haptic_pattern.get("events", [])),
-        "neuro": "calm_alpha_wave"
+        "neuro": "calm_alpha_wave",
     }
-    
+
     # Knowledge graph (placeholder for now)
     kg_data = {
         "segments": segments_data["segments"][:3],  # First 3 segments as example
         "text_length": segments_data["total_length"],
-        "processing_strategy": segments_data["strategy_used"]
+        "processing_strategy": segments_data["strategy_used"],
     }
 
     return ImmersionResponse(
@@ -95,17 +108,20 @@ async def generate_immersion(request: NarrativeRequest):
         knowledge_graph=kg_data,
     )
 
+
 # 若要直接執行此檔案進行測試: uvicorn main:app --reload
 
-from fastapi import Response
-from gtts import gTTS
-import io
 
 class TTSRequest(BaseModel):
     text: str
-    lang: str = 'en'
+    lang: str = "en"
 
-@app.post("/tts", summary="Text-to-Speech", description="Converts text to speech and returns an audio file.")
+
+@app.post(
+    "/tts",
+    summary="Text-to-Speech",
+    description="Converts text to speech and returns an audio file.",
+)
 async def text_to_speech(request: TTSRequest):
     """
     Converts text to speech using available TTS engine.
@@ -123,15 +139,21 @@ class SegmentRequest(BaseModel):
     strategy: str = "adaptive"
 
 
-@app.post("/segment_text", summary="Segment Text", description="Segments narrative text into chunks for processing.")
+@app.post(
+    "/segment_text",
+    summary="Segment Text",
+    description="Segments narrative text into chunks for processing.",
+)
 async def segment_text(request: SegmentRequest):
     """
     Segments text into meaningful chunks.
-    
+
     - **text**: The text to segment.
     - **strategy**: Segmentation strategy ("sentences", "paragraphs", "adaptive").
     """
-    result = text_segmenter.get_segments_with_metadata(request.text, strategy=request.strategy)
+    result = text_segmenter.get_segments_with_metadata(
+        request.text, strategy=request.strategy
+    )
     return result
 
 
@@ -142,11 +164,15 @@ class HapticRequest(BaseModel):
     pattern_name: str = None
 
 
-@app.post("/generate_haptics", summary="Generate Haptic Pattern", description="Generates haptic feedback patterns from text or emotion.")
+@app.post(
+    "/generate_haptics",
+    summary="Generate Haptic Pattern",
+    description="Generates haptic feedback patterns from text or emotion.",
+)
 async def generate_haptics(request: HapticRequest):
     """
     Generates haptic patterns for immersive feedback.
-    
+
     - **text**: Text to generate haptics from (optional).
     - **emotion**: Emotion to generate haptics from (optional).
     - **intensity**: Emotion intensity (0.0-1.0).
@@ -160,18 +186,21 @@ async def generate_haptics(request: HapticRequest):
     elif request.text:
         return haptics_emulator.generate_from_text(request.text)
     elif request.emotion:
-        return haptics_emulator.generate_from_emotion(request.emotion, request.intensity)
+        return haptics_emulator.generate_from_emotion(
+            request.emotion, request.intensity
+        )
     else:
         return {"error": "Must provide text, emotion, or pattern_name"}
 
 
-@app.get("/haptic_patterns", summary="List Haptic Patterns", description="Lists all available haptic patterns.")
+@app.get(
+    "/haptic_patterns",
+    summary="List Haptic Patterns",
+    description="Lists all available haptic patterns.",
+)
 async def list_haptic_patterns():
     """
     Lists all available predefined and custom haptic patterns.
     """
     patterns = haptics_emulator.get_all_patterns()
-    return {
-        "patterns": list(patterns.keys()),
-        "total": len(patterns)
-    }
+    return {"patterns": list(patterns.keys()), "total": len(patterns)}

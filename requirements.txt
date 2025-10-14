@@ -4,3 +4,11 @@ fastapi>=0.100.0
 uvicorn>=0.23.0
 requests>=2.31.0
 typing-extensions>=4.0.0
+gTTS>=2.3.0
+pydantic>=2.0.0
+
+# Development dependencies
+black>=23.0.0
+flake8>=6.0.0
+isort>=5.0.0
+mypy>=1.0.0

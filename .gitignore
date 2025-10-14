@@ -39,3 +39,17 @@ Thumbs.db
 
 # Environment variables
 .env
+
+# Python test and build artifacts
+*.egg-info/
+.eggs/
+*.egg
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Temporary files
+/tmp/
+*.tmp
+*.bak

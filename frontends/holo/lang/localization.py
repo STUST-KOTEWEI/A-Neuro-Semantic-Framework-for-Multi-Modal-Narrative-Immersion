@@ -3,6 +3,7 @@
 
 from typing import Dict
 
+
 class Localization:
     def __init__(self, locale: str):
         self.locale = locale
