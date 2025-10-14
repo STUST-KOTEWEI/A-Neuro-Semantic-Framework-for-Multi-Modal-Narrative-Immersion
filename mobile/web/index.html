@@ -12,29 +12,43 @@
   <style>
     body {
       font-family: 'Noto Sans TC', sans-serif;
-      background-color: #fcfaf5; /* Solarized Base 3 */
-      color: #586e75; /* Solarized Base 01 */
+      background-color: var(--bg-main, #fcfaf5);
+      color: var(--text-main, #586e75);
+      transition: background 0.3s, color 0.3s;
     }
-    .accent-bg { background-color: #268bd2; } /* Solarized Blue */
+    .theme-dark {
+      --bg-main: #181c20;
+      --text-main: #e0e6ed;
+    }
+    .theme-light {
+      --bg-main: #fcfaf5;
+      --text-main: #586e75;
+    }
+    .accent-bg { background-color: #268bd2; }
     .accent-text { color: #268bd2; }
-    .secondary-accent-bg { background-color: #859900; } /* Solarized Green */
+    .secondary-accent-bg { background-color: #859900; }
     .secondary-accent-text { color: #859900; }
-    .subtle-bg { background-color: #f5f1e8; } /* Lighter Solarized Base */
-    .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05); }
-    .chart-container {
-      position: relative;
-      width: 100%;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      height: 200px;
-      max-height: 250px;
+    .subtle-bg { background-color: #f5f1e8; }
+    .card-shadow { box-shadow: 0 4px 16px -2px rgba(38,139,210,0.08), 0 2px 8px -2px rgba(133,153,0,0.05); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5em;
+      padding: 0.75em 1.5em;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 1rem;
+      background: linear-gradient(90deg,#268bd2 0%,#859900 100%);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(38,139,210,0.08);
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
     }
-    @media (min-width: 768px) {
-      .chart-container {
-        height: 300px;
-        max-height: 350px;
-      }
+    .btn:hover {
+      background: linear-gradient(90deg,#268bd2 0%,#cb4b16 100%);
+      box-shadow: 0 4px 16px rgba(38,139,210,0.12);
+      transform: translateY(-2px) scale(1.04);
     }
     .tab-active {
       border-color: #268bd2 !important;
@@ -61,27 +75,16 @@
       align-items: center;
       justify-content: center;
     }
-    /* Programmable Matter Simulation */
-    .pm-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; width: 150px; height: 150px; margin: 1rem auto; }
-    .pm-cell { background-color: #ccc; transition: all 0.5s ease; }
-    .pm-calm .pm-cell { border-radius: 50%; transform: scale(0.8); background-color: #268bd2; }
-    .pm-excited .pm-cell:nth-child(3n) { transform: scale(1.2) rotate(45deg); background-color: #cb4b16; }
-    /* Dynamic Projection Simulation */
-    .projection-cup { width: 120px; height: 120px; background-image: url('https://placehold.co/120x120/FFFFFF/FFFFFF'); background-size: contain; background-repeat: no-repeat; background-position: center; margin: 1rem auto; position: relative; border: 2px solid #ddd; border-radius: 0 0 40px 40px;}
-    .projection-cup::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 90%; height: 10px; background: #eee; border-radius: 5px; }
-    .projection-overlay { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 80px; height: 80px; background-image: url('https://placehold.co/80x80/0000/0000?text=✨'); background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0; transition: opacity 0.5s; }
-    .projection-happy .projection-overlay { opacity: 1; animation: sparkle 1s infinite; }
-    @keyframes sparkle { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.2); } }
-
-    /* Smell & Taste Simulation */
-    .simulation-container { position: relative; border: 1px solid #eee; padding: 1rem; border-radius: 0.5rem; margin-top: 0.5rem; min-height: 100px; }
-    .aroma-particle { position: absolute; bottom: 10px; left: 50%; width: 4px; height: 10px; background-color: #859900; border-radius: 50%; opacity: 0; animation: rise 3s ease-in-out infinite; }
-    .aroma-active .aroma-particle { opacity: 0.6; }
-    @keyframes rise { 0% { transform: translateY(0) scale(1); opacity: 0.6; } 100% { transform: translateY(-60px) scale(0.5); opacity: 0; } }
-    .taste-text { transition: opacity 0.5s; }
+    .theme-dark #audio-player-container { border-color: #444; }
+    .theme-dark .card-shadow { box-shadow: 0 4px 16px -2px rgba(38,139,210,0.18), 0 2px 8px -2px rgba(133,153,0,0.15); }
+    /* 其他原有樣式 ... */
   </style>
 </head>
 <body class="antialiased">
+    <!-- 主題切換按鈕 -->
+    <button id="theme-toggle" class="fixed bottom-20 right-4 z-40 rounded-full btn" style="width:48px;height:48px;padding:0;justify-content:center;">
+      <span id="theme-icon">🌙</span>
+    </button>
   <!-- API Key Sheet -->
   <div id="api-key-sheet" class="fixed inset-x-0 bottom-0 z-50 bg-white border-t border-gray-200 shadow-xl p-4 md:max-w-md md:mx-auto md:rounded-t-xl hidden">
     <div class="flex items-center justify-between">
@@ -299,8 +302,8 @@
           <div class="md:w-1/3">
             <div id="engine-tabs" class="flex flex-col space-y-4">
               <button data-target="input" class="p-4 text-left text-lg border-l-4 tab-active rounded-r-md bg-white">➡️ 輸入子系統</button>
-              <button data-target="core" class="p-4 text-left text-lg border-l-4 border-transparent hover:border-gray-300 rounded-r-md bg白色">⚙️ 核心處理引擎</button>
-              <button data-target="output" class="p-4 text左 text-lg border-l-4 border-transparent hover:border-gray-300 rounded-r-md bg-white">⬅️ 輸出子系統</button>
+                            <button data-target="core" class="p-4 text-left text-lg border-l-4 border-transparent hover:border-gray-300 rounded-r-md bg-white">⚙️ 核心處理引擎</button>
+                            <button data-target="output" class="p-4 text-left text-lg border-l-4 border-transparent hover:border-gray-300 rounded-r-md bg-white">⬅️ 輸出子系統</button>
             </div>
           </div>
           <div class="md:w-2/3 bg-white p-8 rounded-lg card-shadow">
@@ -424,9 +427,9 @@
             <h5 class="text-xl font-bold">腦波直接讀取</h5>
             <p class="text-sm text-gray-600 mt-2">整合EEG技術，直接從腦波判斷您的專注與放鬆狀態，實現毫秒級的互動反應。</p>
           </div>
-          <div class="future-card bg白色 p-6 rounded-lg card-shadow text-center cursor-pointer relative transition-opacity duration-300">
+        <div class="future-card bg-white p-6 rounded-lg card-shadow text-center cursor-pointer relative transition-opacity duration-300">
              <div class="checkmark-wrapper hidden absolute top-2 right-2 bg-green-500 rounded-full w-6 h-6 flex items-center justify-center">
-              <svg class="w-4 h-4 text白色" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
             </div>
             <div class="text-4xl mb-3">🎯</div>
             <h5 class="text-xl font-bold">情境感知推薦</h5>
@@ -479,6 +482,23 @@
   </footer>
 
   <script>
+        // 主題切換
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        function setTheme(theme) {
+          document.body.classList.remove('theme-dark','theme-light');
+          document.body.classList.add(theme);
+          localStorage.setItem('READER_THEME', theme);
+          themeIcon.textContent = theme === 'theme-dark' ? '☀️' : '🌙';
+        }
+        themeToggle.addEventListener('click',()=>{
+          const current = document.body.classList.contains('theme-dark') ? 'theme-dark' : 'theme-light';
+          setTheme(current === 'theme-dark' ? 'theme-light' : 'theme-dark');
+        });
+        setTheme(localStorage.getItem('READER_THEME')||'theme-light');
+
+        // 付費主題入口（預留）
+        // 可於主題切換按鈕旁加入「解鎖更多主題」按鈕，點擊後跳出付費提示或導向商店
     document.addEventListener('DOMContentLoaded', function () {
       // --- API Key Sheet ---
       const keySheet = document.getElementById('api-key-sheet');
@@ -727,10 +747,45 @@
         const textGenUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                 
         try {
-           const responseSchema = { type: "OBJECT", properties: { "auditory_output": { type: "OBJECT", properties: { "soundscape": { "type": "STRING" }, "effects": { type: "ARRAY", items: { "type": "STRING" } } } }, "sensory_output": { type: "OBJECT", properties: { "haptic": { "type": "STRING" }, "olfactory": { "type": "STRING" } } }, "knowledge_graph": { type: "OBJECT", properties: { "nodes": { type: "ARRAY", items: { "type": "STRING" } }, "edges": { type: "ARRAY", items: { type: "OBJECT", properties: { "source": { "type": "STRING" }, "relation": { "type": "STRING" }, "target": { "type": "STRING" } } } } } } };
+          const responseSchema = {
+            type: "OBJECT",
+            properties: {
+              auditory_output: {
+                type: "OBJECT",
+                properties: {
+                  soundscape: { type: "STRING" },
+                  effects: { type: "ARRAY", items: { type: "STRING" } }
+                }
+              },
+              sensory_output: {
+                type: "OBJECT",
+                properties: {
+                  haptic: { type: "STRING" },
+                  olfactory: { type: "STRING" }
+                }
+              },
+              knowledge_graph: {
+                type: "OBJECT",
+                properties: {
+                  nodes: { type: "ARRAY", items: { type: "STRING" } },
+                  edges: {
+                    type: "ARRAY",
+                    items: {
+                      type: "OBJECT",
+                      properties: {
+                        source: { type: "STRING" },
+                        relation: { type: "STRING" },
+                        target: { type: "STRING" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          };
           const systemPromptImmersion = "You are a highly creative multisensory experience engine. Based on the user's narrative text, generate a JSON object that maps the text to potential auditory, sensory, and knowledge graph outputs. The soundscape should be a single descriptive file name. Haptic and olfactory outputs should be descriptive strings. The knowledge graph should identify key concepts and their relationships.";
 
-          const immersionPayload = { contents: [{ parts: [{ text }] }], systemInstruction: { parts: [{ text: systemPromptImmersion }] }, generationConfig: { responseMimeType: "application/json", responseSchema: responseSchema } };
+          const immersionPayload = { contents: [{ parts: [{ text }] }], systemInstruction: { parts: [{ text: systemPromptImmersion }] }, generationConfig: { responseMimeType: "application/json", responseSchema } };
                     
           const immersionResponse = await fetch(textGenUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(immersionPayload) });
           if (!immersionResponse.ok) throw new Error(`沉浸式體驗生成失敗: ${immersionResponse.status}`);

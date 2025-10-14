@@ -36,3 +36,6 @@ Thumbs.db
 
 # Media files
 *.mp3
+
+# Environment variables
+.env

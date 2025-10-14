@@ -30,22 +30,20 @@ class TextSegmenter:
         
     def segment_by_sentences(self, text: str) -> List[Dict[str, Any]]:
         """
-        Segment text by sentence boundaries.
+        Segment text by sentence boundaries with size constraints.
         
         Args:
             text: Input text to segment
             
         Returns:
-            List of dictionaries containing segment information
+            List of text segments with metadata
         """
-        # Split by sentence-ending punctuation
-        sentences = re.split(r'([.!?。！？]+)', text)
-        
-        segments = []
+        # Simple sentence detection using punctuation
+        sentences = re.split(r'([.!?]+)', text)
+        segments: List[Dict[str, Any]] = []
         current_chunk = ""
         current_index = 0
         
-        # Combine sentence and punctuation
         for i in range(0, len(sentences) - 1, 2):
             sentence = sentences[i].strip()
             punctuation = sentences[i + 1] if i + 1 < len(sentences) else ""
@@ -92,7 +90,7 @@ class TextSegmenter:
         # Split by double newlines or multiple spaces/newlines
         paragraphs = re.split(r'\n\s*\n', text)
         
-        segments = []
+        segments: List[Dict[str, Any]] = []
         for idx, paragraph in enumerate(paragraphs):
             paragraph = paragraph.strip()
             if not paragraph:
