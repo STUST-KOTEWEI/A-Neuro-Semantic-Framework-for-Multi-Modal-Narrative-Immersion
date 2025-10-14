@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>AI多感官智能閱讀器 | 互動專案報告</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background-color: #fcfaf5; /* Solarized Base 3 */
+      color: #586e75; /* Solarized Base 01 */
+    }
+    .accent-bg { background-color: #268bd2; } /* Solarized Blue */
+    .accent-text { color: #268bd2; }
+    .secondary-accent-bg { background-color: #859900; } /* Solarized Green */
+    .secondary-accent-text { color: #859900; }
+    .subtle-bg { background-color: #f5f1e8; } /* Lighter Solarized Base */
+    .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05); }
+    .chart-container {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      height: 200px;
+      max-height: 250px;
+    }
+    @media (min-width: 768px) {
+      .chart-container {
+        height: 300px;
+        max-height: 350px;
+      }
+    }
+    .tab-active {
+      border-color: #268bd2 !important;
+      color: #268bd2 !important;
+      font-weight: 700;
+    }
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #268bd2;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes subtle-shake { 0%, 100% { transform: translate(0, 0); } 25%, 75% { transform: translate(-1px, 1px); } 50% { transform: translate(1px, -1px); } }
+    .sensory-feedback { animation: subtle-shake 0.3s ease-in-out; }
+    #audio-player-container {
+      border: 2px dashed #ccc;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* Programmable Matter Simulation */
+    .pm-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; width: 150px; height: 150px; margin: 1rem auto; }
+    .pm-cell { background-color: #ccc; transition: all 0.5s ease; }
+    .pm-calm .pm-cell { border-radius: 50%; transform: scale(0.8); background-color: #268bd2; }
+    .pm-excited .pm-cell:nth-child(3n) { transform: scale(1.2) rotate(45deg); background-color: #cb4b16; }
+    /* Dynamic Projection Simulation */
+    .projection-cup { width: 120px; height: 120px; background-image: url('https://placehold.co/120x120/FFFFFF/FFFFFF'); background-size: contain; background-repeat: no-repeat; background-position: center; margin: 1rem auto; position: relative; border: 2px solid #ddd; border-radius: 0 0 40px 40px;}
+    .projection-cup::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 90%; height: 10px; background: #eee; border-radius: 5px; }
+    .projection-overlay { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 80px; height: 80px; background-image: url('https://placehold.co/80x80/0000/0000?text=✨'); background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0; transition: opacity 0.5s; }
+    .projection-happy .projection-overlay { opacity: 1; animation: sparkle 1s infinite; }
+    @keyframes sparkle { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.2); } }
+
+    /* Smell & Taste Simulation */
+    .simulation-container { position: relative; border: 1px solid #eee; padding: 1rem; border-radius: 0.5rem; margin-top: 0.5rem; min-height: 100px; }
+    .aroma-particle { position: absolute; bottom: 10px; left: 50%; width: 4px; height: 10px; background-color: #859900; border-radius: 50%; opacity: 0; animation: rise 3s ease-in-out infinite; }
+    .aroma-active .aroma-particle { opacity: 0.6; }
+    @keyframes rise { 0% { transform: translateY(0) scale(1); opacity: 0.6; } 100% { transform: translateY(-60px) scale(0.5); opacity: 0; } }
+    .taste-text { transition: opacity 0.5s; }
+  </style>
+</head>
+<body class="antialiased">
+  <!-- API Key Sheet -->
+  <div id="api-key-sheet" class="fixed inset-x-0 bottom-0 z-50 bg-white border-t border-gray-200 shadow-xl p-4 md:max-w-md md:mx-auto md:rounded-t-xl hidden">
+    <div class="flex items-center justify-between">
+      <h2 class="font-bold text-gray-800">設定 Gemini API Key</h2>
+      <button id="close-key-sheet" class="text-gray-500">✕</button>
+    </div>
+    <p class="text-sm text-gray-600 mt-1">僅儲存於本機（localStorage）。可隨時點右下角齒輪開啟。</p>
+    <div class="mt-3 flex gap-2">
+      <input id="api-key-input" type="password" placeholder="AIza..." class="flex-1 border rounded px-3 py-2" />
+      <button id="save-api-key" class="px-4 py-2 bg-blue-600 text-white rounded">儲存</button>
+    </div>
+  </div>
+  <button id="open-key-sheet" class="fixed bottom-4 right-4 z-40 rounded-full bg-blue-600 text-white w-12 h-12 shadow-lg">⚙️</button>
+
+  <!-- Header -->
+  <header class="accent-bg text-white p-4 sticky top-0 z-50 shadow-md">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-xl md:text-2xl font-bold">AI多感官智能閱讀器</h1>
+      <nav id="desktop-nav" class="hidden md:flex space-x-6 font-medium">
+        <a href="#vision" class="hover:text-gray-200">專案願景</a>
+        <a href="#scenarios" class="hover:text-gray-200">應用情境</a>
+        <a href="#demo" class="hover:text-gray-200">線上原型</a>
+        <a href="#engine" class="hover:text-gray-200">HSP引擎</a>
+        <a href="#progress" class="hover:text-gray-200">開發進度</a>
+        <a href="#future" class="hover:text-gray-200">未來展望</a>
+      </nav>
+      <div class="md:hidden">
+        <select id="mobile-nav" class="bg-white text-gray-800 rounded p-2">
+          <option value="#hero">首頁</option>
+          <option value="#vision">專案願景</option>
+          <option value="#scenarios">應用情境</option>
+          <option value="#demo">線上原型</option>
+          <option value="#engine">HSP引擎</option>
+          <option value="#progress">開發進度</option>
+          <option value="#future">未來展望</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section id="hero" class="py-20 md:py-32 text-center" style="background-color: #f5f1e8;">
+      <div class="container mx-auto px-6 flex flex-col items-center">
+        <img src="https://placehold.co/900x400/0d1117/268bd2?text=Holo-Sentient+Engine" alt="AI感知引擎示意圖" class="rounded-lg shadow-2xl mb-12 w-full max-w-4xl">
+        <h2 class="text-4xl md:text-6xl font-bold accent-text mb-4">Holo-Sentient 感知引擎</h2>
+        <p class="text-lg md:text-2xl text-gray-600 max-w-3xl mx-auto">讓知識與情感，在任何情境下都能被感知。我們正在打造一套超越視覺的AI閱讀器，開啟全新的人機互動篇章。</p>
+      </div>
+    </section>
+
+    <!-- Vision Section -->
+    <section id="vision" class="py-16 md:py-24">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+          <h3 class="text-3xl md:text-4xl font-bold">專案願景</h3>
+          <p class="mt-4 text-lg text-gray-600">我們的核心理念是將科技與人性結合，解決傳統閱讀的限制。</p>
+        </div>
+        <div class="grid md:grid-cols-2 gap-8 md:gap-12">
+          <div class="subtle-bg p-8 rounded-lg card-shadow">
+            <div class="text-5xl accent-text mb-4">🌍</div>
+            <h4 class="text-2xl font-bold mb-2">知識面前，人人平等</h4>
+            <p class="text-gray-600">我們致力於打造一個無障礙的知識環境。無論是視障者、行動不便者，或是因語言文化隔閡而學習受阻的族群，都能透過多感官的互動方式，輕鬆獲取資訊與知識。</p>
+          </div>
+          <div class="subtle-bg p-8 rounded-lg card-shadow">
+            <div class="text-5xl secondary-accent-text mb-4">🤝</div>
+            <h4 class="text-2xl font-bold mb-2">讓科技暖起來</h4>
+            <p class="text-gray-600">我們追求的不只是高效的資訊傳遞，更是一種有溫度的情感交流。目標是將人機互動從「工具」關係昇華為「夥伴」關係，讓科技成為促進心理健康、提供情感支持的溫暖媒介。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scenarios Section -->
+    <section id="scenarios" class="py-16 md:py-24 subtle-bg">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+          <h3 class="text-3xl md:text-4xl font-bold">應用情境</h3>
+          <p class="mt-4 text-lg text-gray-600">在您意想不到的時刻，也能沉浸在知識與故事的懷抱中。</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="bg-white p-8 rounded-lg card-shadow text-center">
+            <div class="text-5xl mb-4">🚿</div>
+            <h4 class="text-2xl font-bold mb-2">沐浴中閱讀</h4>
+            <p class="text-gray-600">搭配防水語音裝置與<a href="#engine" class="accent-text hover:underline" data-target-tab="output">觸覺</a>背心，邊洗澡邊聽書，並透過震動提示重點，將零碎時間轉化為學習時光。</p>
+          </div>
+          <div class="bg-white p-8 rounded-lg card-shadow text-center">
+            <div class="text-5xl mb-4">通勤</div>
+            <h4 class="text-2xl font-bold mb-2">通勤中學習</h4>
+            <p class="text-gray-600">在吵雜的捷運上，戴上耳機和<a href="#engine" class="accent-text hover:underline" data-target-tab="output">嗅覺</a>模組。當讀到咖啡主題文章時，釋放的咖啡香氣能幫助您提升專注力與情境感。</p>
+          </div>
+          <div class="bg-white p-8 rounded-lg card-shadow text-center">
+            <div class="text-5xl mb-4">😔</div>
+            <h4 class="text-2xl font-bold mb-2">疲憊時陪伴</h4>
+            <p class="text-gray-600">當您感到情緒低落時，系統能透過<a href="#engine" class="accent-text hover:underline" data-target-tab="input">語音或表情</a>偵測您的狀態，自動切換為鼓勵的語調與正向內容，提供溫暖的陪伴。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Demo Section -->
+    <section id="demo" class="py-16 md:py-24 bg-white">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+          <h3 class="text-3xl md:text-4xl font-bold">線上原型互動</h3>
+          <p class="mt-4 text-lg text-gray-600">親身體驗 Project-HOLO 的核心功能！選擇一種輸入方式，感受多模態的魅力。</p>
+        </div>
+        <div class="max-w-3xl mx-auto">
+           <div class="mb-4 border-b border-gray-200">
+            <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="demo-tabs">
+              <li class="mr-2"><button class="inline-block p-4 border-b-2 rounded-t-lg tab-active" data-target="demo-text">📝 文字輸入</button></li>
+              <li class="mr-2"><button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-target="demo-book">📚 書籍封面/ISBN</button></li>
+              <li class="mr-2"><button class="inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" data-target="demo-face">😊 情感臉部辨識</button></li>
+            </ul>
+          </div>
+
+          <div id="demo-content">
+            <div id="demo-text" class="flex flex-col gap-4">
+              <textarea id="text-input" placeholder="在這裡輸入您的故事或情境... 例如：在一個下著雨的夜晚，我獨自走在森林裡..." rows="5" class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 transition duration-200 resize-none subtle-bg"></textarea>
+            </div>
+            <div id="demo-book" class="hidden flex-col gap-4">
+              <div id="book-input-options" class="flex gap-4">
+                <label for="image-upload" class="flex-1 flex flex-col items-center justify-center w-full p-4 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                  <svg class="w-8 h-8 mb-2 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/></svg>
+                  <span class="font-semibold text-sm">從檔案上傳</span>
+                  <input id="image-upload" type="file" class="hidden" accept="image/*" />
+                </label>
+                <button id="take-photo-btn" class="flex-1 flex flex-col items-center justify-center w-full p-4 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                   <svg class="w-8 h-8 mb-2 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 12h2M2 12H0m18-8h2M2 4H0m15 11.5 1.5 1.5M4.5 5.5 3 4m13.5.5-1.5 1.5M6 18.5 4.5 20"/></svg>
+                  <span class="font-semibold text-sm">使用相機拍照</span>
+                </button>
+              </div>
+               <div id="camera-view" class="hidden w-full aspect-video bg-gray-900 rounded-lg relative">
+                <video id="camera-stream" class="w-full h-full rounded-lg" autoplay playsinline></video>
+                <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-4">
+                  <button id="capture-btn" class="w-16 h-16 bg-white rounded-full border-4 border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"></button>
+                  <button id="cancel-camera-btn" class="absolute left-full ml-4 top-1/2 -translate-y-1/2 text-white bg-red-600 rounded-full w-8 h-8 flex items-center justify-center">X</button>
+                </div>
+              </div>
+              <div id="image-preview-container" class="hidden w-full text-center">
+                <img id="image-preview" src="#" alt="Image preview" class="max-h-60 mx-auto rounded-lg shadow-md"/>
+                <p id="image-caption" class="text-sm text-gray-600 mt-2"></p>
+              </div>
+            </div>
+            <div id="demo-face" class="hidden flex-col gap-4">
+              <div id="face-cam-container" class="w-full bg-gray-900 aspect-video rounded-lg flex items-center justify-center text-white mb-4 relative">
+                <video id="video-feed" class="w-full h-full rounded-lg hidden" autoplay playsinline></video>
+                <img id="cam-placeholder-img" src="https://storage.googleapis.com/be-prod-data-gcs-models-and-assets-v2/image_b1d420.png" alt="鏡頭未啟動" class="w-full h-full object-cover rounded-lg">
+                <span id="cam-placeholder" class="hidden text-gray-400">鏡頭未啟動</span>
+              </div>
+              <button id="face-rec-btn" class="w-full bg-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-700 transition duration-200">啟動鏡頭並辨識情緒</button>
+              <p id="emotion-result" class="text-center mt-2 font-medium h-6"></p>
+            </div>
+          </div>
+                    
+          <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="voice-lang-input" class="block text-sm font-medium text-gray-700">選擇或輸入語言</label>
+              <input list="voice-lang-list" id="voice-lang-input" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md" value="中文">
+              <datalist id="voice-lang-list">
+                 <option value="中文"></option>
+                 <option value="英文"></option>
+                 <option value="日文"></option>
+                 <option value="ar-EG"></option><option value="de-DE"></option><option value="en-US"></option><option value="es-US"></option><option value="fr-FR"></option><option value="hi-IN"></option><option value="id-ID"></option><option value="it-IT"></option><option value="ja-JP"></option><option value="ko-KR"></option><option value="pt-BR"></option><option value="ru-RU"></option><option value="nl-NL"></option><option value="pl-PL"></option><option value="th-TH"></option><option value="tr-TR"></option><option value="vi-VN"></option><option value="ro-RO"></option><option value="uk-UA"></option><option value="bn-BD"></option><option value="en-IN"></option><option value="mr-IN"></option><option value="ta-IN"></option><option value="te-IN"></option>
+              </datalist>
+            </div>
+            <div>
+              <label for="voice-style-input" class="block text-sm font-medium text-gray-700">聲音風格 (由感測器模擬)</label>
+               <div class="mt-1 flex justify-around p-2 bg-gray-100 rounded-md" id="style-sensors">
+                <button data-style="溫暖且引人入勝" class="style-sensor p-2 rounded-md transition-colors duration-200 bg-blue-200 ring-2 ring-blue-500" title="手環：偵測到平靜的心率">🖐️</button>
+                <button data-style="生動活潑的故事風格" class="style-sensor p-2 rounded-md transition-colors duration-200" title="鏡頭：偵測到微笑表情">📷</button>
+                <button data-style="專業且清晰" class="style-sensor p-2 rounded-md transition-colors duration-200" title="智慧眼鏡：偵測到閱讀專注模式">👓</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-4 mt-6">
+            <button id="generate-btn" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-green-500 text-white font-bold py-3 px-6 rounded-lg hover:from-blue-600 hover:to-green-600 transition duration-200 disabled:opacity-50">
+              <span id="generate-loader" class="hidden loader"></span>
+              <span id="generate-text">🚀 開始生成完整體驗</span>
+            </button>
+          </div>
+
+          <div id="error-message" class="text-red-600 mt-4 text-center h-5"></div>
+           <div id="audio-player-container" class="mt-6 w-full">
+            <p id="audio-placeholder" class="text-center text-gray-500 text-sm">語音播放器將會顯示於此。</p>
+           </div>
+
+          <div id="result-container" class="hidden mt-8 text-left bg-gray-50 p-6 rounded-lg card-shadow">
+            <h2 class="text-2xl font-bold mb-4 border-b pb-2">✨ AI 生成結果</h2>
+            <div class="result-section">
+              <h3 class="font-bold text-lg accent-text">🎧 聽覺輸出建議</h3>
+              <pre id="auditory-output" class="mt-2 bg-gray-100 p-4 rounded text-sm overflow-x-auto"></pre>
+            </div>
+            <div class="result-section mt-4">
+              <h3 class="font-bold text-lg secondary-accent-text">🖐️ 感官輸出建議</h3>
+              <pre id="sensory-output" class="mt-2 bg-gray-100 p-4 rounded text-sm overflow-x-auto"></pre>
+            </div>
+            <div class="result-section mt-4">
+              <h3 class="font-bold text-lg text-purple-600">🧠 知識圖譜分析</h3>
+              <pre id="kg-output" class="mt-2 bg-gray-100 p-4 rounded text-sm overflow-x-auto"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Engine Section -->
+    <section id="engine" class="py-16 md:py-24 subtle-bg">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+          <h3 class="text-3xl md:text-4xl font-bold">HSP引擎互動詳解</h3>
+          <p class="mt-4 text-lg text-gray-600">點擊下方模組，探索HSP引擎如何感知文字背後的情感與氛圍。</p>
+        </div>
+        <div class="flex flex-col md:flex-row gap-8">
+          <div class="md:w-1/3">
+            <div id="engine-tabs" class="flex flex-col space-y-4">
+              <button data-target="input" class="p-4 text-left text-lg border-l-4 tab-active rounded-r-md bg-white">➡️ 輸入子系統</button>
+              <button data-target="core" class="p-4 text-left text-lg border-l-4 border-transparent hover:border-gray-300 rounded-r-md bg白色">⚙️ 核心處理引擎</button>
+              <button data-target="output" class="p-4 text左 text-lg border-l-4 border-transparent hover:border-gray-300 rounded-r-md bg-white">⬅️ 輸出子系統</button>
+            </div>
+          </div>
+          <div class="md:w-2/3 bg-white p-8 rounded-lg card-shadow">
+            <div id="engine-details">
+              <div id="detail-input">
+                <h4 class="text-2xl font-bold accent-text mb-4">輸入子系統 (Input Subsystems)</h4>
+                <p class="mb-4 text-gray-600">這是HSP引擎感知世界的起點，它從多個維度接收資訊，不僅僅是文字。</p>
+                <ul class="space-y-3 list-disc list-inside">
+                  <li><strong>文字解析：</strong> 讀懂您提供的文本、文章。</li>
+                  <li><strong>ISBN/封面辨識：</strong> 只需掃描書籍條碼或封面，即可快速取得書籍資訊並開始沉浸式閱讀。</li>
+                  <li><strong>影像與臉部辨識：</strong> 分析圖像內容或您的臉部表情，將視覺元素轉化為其他感官體驗。</li>
+                  <li><strong>語音辨識與韻律分析：</strong> 不只聽懂您說話的內容，更能分析您的語氣情感。</li>
+                  <li><strong>生物特徵感測：</strong> 連接智慧手錶等穿戴裝置，讀取心跳等生理訊號，了解您的即時情緒狀態。</li>
+                </ul>
+              </div>
+              <div id="detail-core" class="hidden">
+                <h4 class="text-2xl font-bold accent-text mb-4">核心處理：HSP引擎 (Core Processing)</h4>
+                <p class="mb-4 text-gray-600">這裡是系統的心臟與大腦。它將接收到的資訊轉化為豐富的多感官訊號。</p>
+                <ul class="space-y-3 list-disc list-inside">
+                  <li><strong>NLP & SQL 資料庫：</strong> 透過自然語言處理(NLP)分析使用者偏好，並將這些數據結構化存儲於SQL資料庫，形成個人化的感官設定檔。</li>
+                  <li><strong>LLM Fine-Tuning：</strong> 基於使用者的回饋與偏好資料，對大型語言模型(LLM)進行微調，讓生成的內容與感官建議更貼近個人風格。</li>
+                  <li><strong>情感回饋迴路：</strong> 偵測您的情緒，若您感到疲憊，系統會自動放慢語速或切換音色。</li>
+                  <li><strong>多模態訊號輸出：</strong> 根據文本情境，觸發氣味、震動等訊號，創造身歷其境的體驗。</li>
+                </ul>
+              </div>
+              <div id="detail-output" class="hidden">
+                <h4 class="text-2xl font-bold accent-text mb-4">輸出子系統 (Output Subsystems)</h4>
+                <p class="mb-4 text-gray-600">將引擎處理後的結果，以最真實、最沉浸的方式呈現給您。</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <div class="simulation-container">
+                    <h6 class="font-bold">觸覺回饋 (Haptic)</h6>
+                    <p class="text-xs text-gray-500">透過<a href="https://teslasuit.io/" target="_blank" class="accent-text hover:underline">Teslasuit</a>等裝置，模擬心跳、雨滴等感覺。</p>
+                  </div>
+                   <div class="simulation-container" id="olfactory-sim">
+                    <h6 class="font-bold">嗅覺模擬 (Olfactory)</h6>
+                    <p class="text-xs text-gray-500">當偵測到關鍵字「咖啡」，釋放模擬香氣。</p>
+                    <div class="aroma-particles-container absolute bottom-0 left-0 w-full h-full pointer-events-none"></div>
+                  </div>
+                  <div class="simulation-container">
+                    <h6 class="font-bold">味覺模擬 (Gustatory)</h6>
+                    <p class="text-xs text-gray-500">當偵測到關鍵字「甜」，觸發味覺裝置。</p>
+                    <p id="taste-text" class="text-center font-bold secondary-accent-text opacity-0 mt-4">釋放「甜味」訊號...</p>
+                  </div>
+                </div>
+
+
+                <h5 class="text-xl font-bold text-gray-800 mt-8 mb-3">前瞻性輸出：視覺與物理互動</h5>
+                <p class="mb-4 text-gray-600">我們的終極目標是模糊現實與故事的界線。系統會參照您的臉部表情與閱讀內容，動態生成視覺與物理輸出：</p>
+                                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div class="text-center">
+                    <h6 class="font-bold">模擬：互動動態投影</h6>
+                    <p class="text-xs text-gray-500 mb-2">偵測到「開心」情緒時</p>
+                    <div id="projection-simulation" class="projection-cup">
+                      <div class="projection-overlay"></div>
+                    </div>
+                  </div>
+                  <div class="text-center">
+                    <h6 class="font-bold">模擬：可編程物質</h6>
+                    <p class="text-xs text-gray-500 mb-2">偵測到「平靜」與「驚訝」情緒時</p>
+                    <div id="pm-simulation" class="pm-grid">
+                      <script>for(let i=0;i<100;i++) document.write('<div class="pm-cell"></div>');</script>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div class="relative rounded-lg overflow-hidden shadow-lg" style="padding-top: 56.25%;"> <!-- 16:9 Aspect Ratio -->
+                  <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/5B-hyodzi1w" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+                <p class="text-xs text-center mt-2 text-gray-500">影片來源: MIT CSAIL - "Interactive Dynamic Video"</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Progress Section -->
+    <section id="progress" class="py-16 md:py-24">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+          <h3 class="text-3xl md:text-4xl font-bold">開發進度與原型</h3>
+          <p class="mt-4 text-lg text-gray-600">我們已在Hugging Face平台部署了兩款原型，以驗證核心功能。</p>
+        </div>
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="subtle-bg p-8 rounded-lg card-shadow">
+            <h4 class="text-2xl font-bold mb-2">1. my-reader-gpt</h4>
+            <span class="inline-block bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded">聲音核心測試版</span>
+            <p class="mt-4 text-gray-600">此版本專注於將文字轉化為高品質、聽感自然的語音。我們成功解決了長篇文本生成中的韻律與一致性問題，為後續開發奠定了穩固基石。</p>
+            <div class="mt-6">
+              <p class="font-bold text-gray-700">語音自然度(MOS)評分:</p>
+              <div class="chart-container">
+                <canvas id="mosChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="subtle-bg p-8 rounded-lg card-shadow">
+            <h4 class="text-2xl font-bold mb-2">2. holo-reader-final</h4>
+            <span class="inline-block bg-green-100 text-green-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded">多感官整合測試版</span>
+             <img src="https://placehold.co/600x300/f5f1e8/586e75?text=Multi-Sensory+Signal+Mapping" alt="多感官訊號映射示意圖" class="rounded-md my-4 w-full object-cover">
+            <p class="mt-4 text-gray-600">作為更進階的版本，此原型開始整合多模態訊號映射。我們正聚焦於建立一套演算法，將文本中抽象的情緒（如懸疑、喜悅）有效轉譯為具體的觸覺、嗅覺等非視覺訊號。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Future Section -->
+    <section id="future" class="py-16 md:py-24 subtle-bg">
+      <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+          <h3 class="text-3xl md:text-4xl font-bold">未來展望</h3>
+          <p class="mt-4 text-lg text-gray-600">我們的終極夢想是打造一個真正懂您的AI閱讀夥伴，以下是我們想挑戰的瘋狂點子！</p>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div class="future-card bg-white p-6 rounded-lg card-shadow text-center cursor-pointer relative transition-opacity duration-300">
+            <div class="checkmark-wrapper hidden absolute top-2 right-2 bg-green-500 rounded-full w-6 h-6 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <div class="text-4xl mb-3">🧠</div>
+            <h5 class="text-xl font-bold">腦波直接讀取</h5>
+            <p class="text-sm text-gray-600 mt-2">整合EEG技術，直接從腦波判斷您的專注與放鬆狀態，實現毫秒級的互動反應。</p>
+          </div>
+          <div class="future-card bg白色 p-6 rounded-lg card-shadow text-center cursor-pointer relative transition-opacity duration-300">
+             <div class="checkmark-wrapper hidden absolute top-2 right-2 bg-green-500 rounded-full w-6 h-6 flex items-center justify-center">
+              <svg class="w-4 h-4 text白色" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <div class="text-4xl mb-3">🎯</div>
+            <h5 class="text-xl font-bold">情境感知推薦</h5>
+            <p class="text-sm text-gray-600 mt-2">不僅根據您的偏好，更能結合當下心境推薦內容。心情不好時，為您送上溫暖的故事。</p>
+          </div>
+          <div class="future-card bg-white p-6 rounded-lg card-shadow text-center cursor-pointer relative transition-opacity duration-300">
+             <div class="checkmark-wrapper hidden absolute top-2 right-2 bg-green-500 rounded-full w-6 h-6 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <div class="text-4xl mb-3">✍️</div>
+            <h5 class="text-xl font-bold">創作者生態系</h5>
+            <p class="text-sm text-gray-600 mt-2">提供工具，讓作家能為作品嵌入「感官特效」，催生全新的互動式內容創作。</p>
+          </div>
+          <div class="future-card bg-white p-6 rounded-lg card-shadow text-center cursor-pointer relative transition-opacity duration-300">
+             <div class="checkmark-wrapper hidden absolute top-2 right-2 bg-green-500 rounded-full w-6 h-6 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <div class="text-4xl mb-3">🧊</div>
+            <h5 class="text-xl font-bold">可編程物質</h5>
+            <p class="text-sm text-gray-600 mt-2">將故事「召喚」到現實！讓您親手觸摸到書中描寫的山丘或動物的質感。</p>
+          </div>
+          <div class="future-card bg-white p-6 rounded-lg card-shadow text-center cursor-pointer relative transition-opacity duration-300">
+             <div class="checkmark-wrapper hidden absolute top-2 right-2 bg-green-500 rounded-full w-6 h-6 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <div class="text-4xl mb-3">✨</div>
+            <h5 class="text-xl font-bold">互動動態投影</h5>
+            <p class="text-sm text-gray-600 mt-2">將動畫投影到日常物品上，讓您桌上的馬克杯冒出書中描寫的熱氣，模糊現實與故事的界線。</p>
+          </div>
+          <div class="future-card bg-white p-6 rounded-lg card-shadow text-center cursor-pointer relative transition-opacity duration-300">
+             <div class="checkmark-wrapper hidden absolute top-2 right-2 bg-green-500 rounded-full w-6 h-6 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <div class="text-4xl mb-3">🔋</div>
+            <h5 class="text-xl font-bold">次世代能源</h5>
+            <p class="text-sm text-gray-600 mt-2">導入微型核電池或量子充電技術，實現真正的無線自由，讓裝置永遠陪伴在您身邊。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-gray-800 text-white py-8">
+    <div class="container mx-auto text-center px-6">
+      <p class="font-bold">「AI多感官智能閱讀器」專案</p>
+      <p class="text-sm mt-2">呈報人：柯德瑋 (TE-WEI KO)</p>
+      <p class="text-sm mt-2">南臺科技大學資訊工程系</p>
+      <p class="text-xs text-gray-400 mt-1">2025年10月</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // --- API Key Sheet ---
+      const keySheet = document.getElementById('api-key-sheet');
+      const openKey = document.getElementById('open-key-sheet');
+      const closeKey = document.getElementById('close-key-sheet');
+      const saveKey = document.getElementById('save-api-key');
+      const keyInput = document.getElementById('api-key-input');
+      function showKeySheet(show){ if(!keySheet) return; keySheet.classList.toggle('hidden', !show); }
+      showKeySheet(!localStorage.getItem('GEMINI_API_KEY'));
+      if(openKey) openKey.addEventListener('click',()=>showKeySheet(true));
+      if(closeKey) closeKey.addEventListener('click',()=>showKeySheet(false));
+      if(saveKey) saveKey.addEventListener('click',()=>{ const v=keyInput.value.trim(); if(!v){ alert('請輸入 API Key'); return;} localStorage.setItem('GEMINI_API_KEY', v); showKeySheet(false); });
+
+      // --- Helper functions for Audio Processing ---
+      function base64ToArrayBuffer(base64) { const binaryString = window.atob(base64); const len = binaryString.length; const bytes = new Uint8Array(len); for (let i = 0; i < len; i++) { bytes[i] = binaryString.charCodeAt(i); } return bytes.buffer; }
+      function pcmToWav(pcmData, sampleRate) { const numChannels = 1; const bitsPerSample = 16; const byteRate = sampleRate * numChannels * bitsPerSample / 8; const blockAlign = numChannels * bitsPerSample / 8; const dataSize = pcmData.length * pcmData.BYTES_PER_ELEMENT; const buffer = new ArrayBuffer(44 + dataSize); const view = new DataView(buffer); function writeString(view, offset, string) { for (let i = 0; i < string.length; i++) { view.setUint8(offset + i, string.charCodeAt(i)); } } writeString(view, 0, 'RIFF'); view.setUint32(4, 36 + dataSize, true); writeString(view, 8, 'WAVE'); writeString(view, 12, 'fmt '); view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, numChannels, true); view.setUint32(24, sampleRate, true); view.setUint32(28, byteRate, true); view.setUint16(32, blockAlign, true); view.setUint16(34, bitsPerSample, true); writeString(view, 36, 'data'); view.setUint32(40, dataSize, true); const pcm = new Int16Array(pcmData); for (let i = 0; i < pcm.length; i++) { view.setInt16(44 + i * 2, pcm[i], true); } return new Blob([view], { type: 'audio/wav' }); }
+
+      // --- Smooth Scrolling for Desktop Navigation ---
+      document.querySelectorAll('#desktop-nav a').forEach(anchor => {
+        anchor.addEventListener('click', function (e) { e.preventDefault(); document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' }); });
+      });
+
+      // --- Mobile Navigation ---
+      const mobileNav = document.getElementById('mobile-nav');
+      if (mobileNav) { mobileNav.addEventListener('change', (event) => { const targetId = event.target.value; document.querySelector(targetId).scrollIntoView({ behavior: 'smooth' }); }); }
+
+      // --- Scenario Links to Engine Tab ---
+      document.querySelectorAll('a[data-target-tab]').forEach(link => {
+        link.addEventListener('click', function(e) { e.preventDefault(); const targetId = this.getAttribute('href'); const targetTab = this.dataset.targetTab; document.querySelector(targetId).scrollIntoView({ behavior: 'smooth' }); const button = engineTabsContainer.querySelector(`button[data-target="${targetTab}"]`); if (button) { setTimeout(() => button.click(), 500); } });
+      });
+
+      // --- Engine Tabs Interaction ---
+      const engineTabsContainer = document.getElementById('engine-tabs');
+      const engineDetails = document.getElementById('engine-details');
+      if (engineTabsContainer && engineDetails) {
+        const detailPanels = engineDetails.querySelectorAll('div[id^="detail-"]');
+        const pmSimulation = document.getElementById('pm-simulation');
+        const projectionSimulation = document.getElementById('projection-simulation');
+        const olfactorySim = document.getElementById('olfactory-sim');
+        const tasteText = document.getElementById('taste-text');
+
+        engineTabsContainer.addEventListener('click', (event) => {
+          const button = event.target.closest('button');
+          if (!button) return;
+
+          const targetId = button.dataset.target;
+          engineTabsContainer.querySelectorAll('button').forEach(btn => { btn.classList.remove('tab-active'); btn.classList.add('border-transparent'); });
+          button.classList.add('tab-active');
+          button.classList.remove('border-transparent');
+
+          detailPanels.forEach(panel => {
+            const isActive = panel.id === `detail-${targetId}`;
+            isActive ? panel.classList.remove('hidden') : panel.classList.add('hidden');
+            if (isActive && panel.id === 'detail-output') {
+               setTimeout(() => projectionSimulation.classList.add('projection-happy'), 500);
+               setTimeout(() => { if(olfactorySim){ olfactorySim.classList.add('aroma-active'); const particleContainer = olfactorySim.querySelector('.aroma-particles-container'); if(particleContainer){ particleContainer.innerHTML = ''; for(let i = 0; i < 5; i++) { const particle = document.createElement('div'); particle.className = 'aroma-particle'; particle.style.left = `${40 + Math.random() * 20}%`; particle.style.animationDelay = `${Math.random() * 2}s`; particleContainer.appendChild(particle); } } } }, 1000);
+               setTimeout(() => tasteText && tasteText.classList.remove('opacity-0'), 1500);
+               setTimeout(() => { pmSimulation && pmSimulation.classList.add('pm-calm'); }, 2000);
+               setTimeout(() => { if(pmSimulation){ pmSimulation.classList.remove('pm-calm'); pmSimulation.classList.add('pm-excited'); } }, 3500);
+               setTimeout(() => { projectionSimulation && projectionSimulation.classList.remove('projection-happy'); pmSimulation && pmSimulation.classList.remove('pm-excited'); olfactorySim && olfactorySim.classList.remove('aroma-active'); tasteText && tasteText.classList.add('opacity-0'); }, 5000);
+            }
+          });
+        });
+      }
+
+      // --- Demo Tabs Interaction ---
+      const demoTabsContainer = document.getElementById('demo-tabs');
+      const demoContent = document.getElementById('demo-content');
+      if (demoTabsContainer && demoContent) {
+        const demoPanels = demoContent.querySelectorAll('div[id^="demo-"]');
+        demoTabsContainer.addEventListener('click', (event) => {
+          const button = event.target.closest('button');
+          if (!button) return;
+          const targetId = button.dataset.target;
+          demoTabsContainer.querySelectorAll('button').forEach(btn => { btn.classList.remove('tab-active'); btn.classList.add('border-transparent'); });
+          button.classList.add('tab-active');
+          button.classList.remove('border-transparent');
+          demoPanels.forEach(panel => { if (panel.id === targetId) { panel.classList.remove('hidden'); panel.classList.add('flex'); } else { panel.classList.add('hidden'); panel.classList.remove('flex'); } });
+        });
+      }
+            
+      // --- Interactive Demo Logic ---
+      const textInput = document.getElementById('text-input');
+      const generateBtn = document.getElementById('generate-btn');
+      const errorMessage = document.getElementById('error-message');
+      const resultContainer = document.getElementById('result-container');
+      const auditoryOutput = document.getElementById('auditory-output');
+      const sensoryOutput = document.getElementById('sensory-output');
+      const kgOutput = document.getElementById('kg-output');
+      const audioPlayerContainer = document.getElementById('audio-player-container');
+      const audioPlaceholder = document.getElementById('audio-placeholder');
+      const voiceLangInput = document.getElementById('voice-lang-input');
+      const styleSensors = document.getElementById('style-sensors');
+      let selectedStyle = "溫暖且引人入勝";
+            
+      const generateLoader = document.getElementById('generate-loader');
+      const generateText = document.getElementById('generate-text');
+
+      const imageUpload = document.getElementById('image-upload');
+      const takePhotoBtn = document.getElementById('take-photo-btn');
+      const bookInputOptions = document.getElementById('book-input-options');
+      const cameraView = document.getElementById('camera-view');
+      const cameraStream = document.getElementById('camera-stream');
+      const captureBtn = document.getElementById('capture-btn');
+      const cancelCameraBtn = document.getElementById('cancel-camera-btn');
+      const imagePreviewContainer = document.getElementById('image-preview-container');
+      const imagePreview = document.getElementById('image-preview');
+      const imageCaption = document.getElementById('image-caption');
+      let currentStream;
+            
+      const faceRecBtn = document.getElementById('face-rec-btn');
+      const camPlaceholder = document.getElementById('cam-placeholder');
+      const emotionResult = document.getElementById('emotion-result');
+      const videoFeed = document.getElementById('video-feed');
+      const camPlaceholderImg = document.getElementById('cam-placeholder-img');
+            
+      styleSensors.addEventListener('click', (e) => {
+        const button = e.target.closest('button');
+        if (!button) return;
+                
+        styleSensors.querySelectorAll('button').forEach(btn => { btn.classList.remove('bg-blue-200', 'ring-2', 'ring-blue-500'); });
+                
+        button.classList.add('bg-blue-200', 'ring-2', 'ring-blue-500');
+        selectedStyle = button.dataset.style;
+      });
+
+
+      function stopCurrentCameraStream() {
+        if (currentStream) { currentStream.getTracks().forEach(track => track.stop()); }
+      }
+            
+      // Book Cover / ISBN Logic
+      takePhotoBtn.addEventListener('click', async () => {
+        bookInputOptions.classList.add('hidden');
+        cameraView.classList.remove('hidden');
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+          currentStream = stream;
+          cameraStream.srcObject = stream;
+        } catch (err) {
+          errorMessage.textContent = '無法啟動相機。請確認權限。';
+          bookInputOptions.classList.remove('hidden');
+          cameraView.classList.add('hidden');
+        }
+      });
+
+      cancelCameraBtn.addEventListener('click', () => {
+        stopCurrentCameraStream();
+        cameraView.classList.add('hidden');
+        bookInputOptions.classList.remove('hidden');
+      });
+
+      captureBtn.addEventListener('click', () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = cameraStream.videoWidth;
+        canvas.height = cameraStream.videoHeight;
+        canvas.getContext('2d').drawImage(cameraStream, 0, 0);
+        const imageUrl = canvas.toDataURL('image/jpeg');
+                
+        imagePreview.src = imageUrl;
+        imagePreviewContainer.classList.remove('hidden');
+                
+        stopCurrentCameraStream();
+        cameraView.classList.add('hidden');
+        bookInputOptions.classList.remove('hidden');
+
+        imageCaption.textContent = '正在辨識拍攝的書籍...';
+        setTimeout(() => {
+          const simulatedText = '偵測到拍攝書籍：《人類大歷史》。這本書從十萬年前有生命跡象開始，講述了人類如何崛起成為地球的主宰...';
+          imageCaption.textContent = '辨識完成！';
+          textInput.value = simulatedText;
+        }, 1500);
+      });
+
+      imageUpload.addEventListener('change', function(event) {
+        if (event.target.files && event.target.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            imagePreview.src = e.target.result;
+            imagePreviewContainer.classList.remove('hidden');
+            textInput.value = ''; 
+            resultContainer.classList.add('hidden');
+            imageCaption.textContent = '正在辨識書籍封面/ISBN...';
+            setTimeout(() => {
+              const isISBN = Math.random() > 0.5;
+              const simulatedText = isISBN 
+                ? '偵測到 ISBN 條碼。書名：《三體》，作者：劉慈欣。這是一部描繪宇宙文明間生存鬥爭的科幻史詩...'
+                : '偵測到書籍封面：《小王子》。這本書透過一位來自外星球的小王子的視角，探討了愛、失落與人生的真諦...';
+              imageCaption.textContent = isISBN ? 'ISBN 辨識完成！' : '封面辨識完成！';
+              textInput.value = simulatedText;
+            }, 1500);
+          }
+          reader.readAsDataURL(event.target.files[0]);
+        }
+      });
+
+      // Facial Emotion Recognition Logic
+      faceRecBtn.addEventListener('click', () => {
+        emotionResult.textContent = '正在啟動鏡頭並分析情緒...';
+        camPlaceholder.textContent = '請允許攝影機權限...';
+        camPlaceholderImg.classList.add('hidden');
+                
+        setTimeout(() => {
+          const emotions = [
+            { emotion: '開心 😊', text: '今天真是個好日子，陽光普照，微風徐徐...' },
+            { emotion: '平靜 😌', text: '寧靜的午後，適合來杯茶，靜靜地看本書。' },
+            { emotion: '驚訝 😮', text: '哇！真是個意想不到的發展，接下來會發生什麼事呢？' },
+            { emotion: '專注 🤔', text: '讓我們來深入探討這個複雜的問題，抽絲剝繭找出答案。' }
+          ];
+          const detected = emotions[Math.floor(Math.random() * emotions.length)];
+                    
+          navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+              currentStream = stream;
+              videoFeed.srcObject = stream;
+              videoFeed.classList.remove('hidden');
+              camPlaceholder.classList.add('hidden');
+            })
+            .catch(err => {
+               emotionResult.textContent = '無法啟動鏡頭。';
+               videoFeed.classList.add('hidden');
+               camPlaceholderImg.classList.remove('hidden');
+               camPlaceholder.classList.add('hidden');
+            });
+
+          emotionResult.textContent = '偵測到情緒：' + detected.emotion;
+          textInput.value = detected.text;
+        }, 2000);
+      });
+
+      // Combined Experience Generation
+      generateBtn.addEventListener('click', async () => {
+        const text = textInput.value.trim();
+        if (!text) { errorMessage.textContent = '請先輸入文字、上傳圖片或進行臉部辨識'; return; }
+
+        const apiKey = localStorage.getItem('GEMINI_API_KEY') || '';
+        if (!apiKey) { errorMessage.textContent = '請先設定 Gemini API Key（點右下齒輪）'; showKeySheet(true); return; }
+
+        errorMessage.textContent = '';
+        audioPlayerContainer.innerHTML = `<p id="audio-placeholder" class="text-center text-gray-500 text-sm">語音播放器將會顯示於此。</p>`;
+        resultContainer.classList.add('hidden');
+        generateLoader.classList.remove('hidden');
+        generateText.textContent = '✨ AI分析情境中...';
+        generateBtn.disabled = true;
+
+        const textGenUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                
+        try {
+           const responseSchema = { type: "OBJECT", properties: { "auditory_output": { type: "OBJECT", properties: { "soundscape": { "type": "STRING" }, "effects": { type: "ARRAY", items: { "type": "STRING" } } } }, "sensory_output": { type: "OBJECT", properties: { "haptic": { "type": "STRING" }, "olfactory": { "type": "STRING" } } }, "knowledge_graph": { type: "OBJECT", properties: { "nodes": { type: "ARRAY", items: { "type": "STRING" } }, "edges": { type: "ARRAY", items: { type: "OBJECT", properties: { "source": { "type": "STRING" }, "relation": { "type": "STRING" }, "target": { "type": "STRING" } } } } } } };
+          const systemPromptImmersion = "You are a highly creative multisensory experience engine. Based on the user's narrative text, generate a JSON object that maps the text to potential auditory, sensory, and knowledge graph outputs. The soundscape should be a single descriptive file name. Haptic and olfactory outputs should be descriptive strings. The knowledge graph should identify key concepts and their relationships.";
+
+          const immersionPayload = { contents: [{ parts: [{ text }] }], systemInstruction: { parts: [{ text: systemPromptImmersion }] }, generationConfig: { responseMimeType: "application/json", responseSchema: responseSchema } };
+                    
+          const immersionResponse = await fetch(textGenUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(immersionPayload) });
+          if (!immersionResponse.ok) throw new Error(`沉浸式體驗生成失敗: ${immersionResponse.status}`);
+          const immersionResult = await immersionResponse.json();
+          const generatedJsonText = immersionResult.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (!generatedJsonText) throw new Error('無法生成沉浸式體驗資料。');
+                    
+          const generatedData = JSON.parse(generatedJsonText);
+
+          auditoryOutput.textContent = JSON.stringify(generatedData.auditory_output, null, 2);
+          sensoryOutput.textContent = JSON.stringify(generatedData.sensory_output, null, 2);
+          kgOutput.textContent = JSON.stringify(generatedData.knowledge_graph, null, 2);
+                    
+          resultContainer.classList.remove('hidden');
+          document.body.classList.add('sensory-feedback');
+          setTimeout(() => document.body.classList.remove('sensory-feedback'), 300);
+
+          // --- Part 2: Generate and Play High-Quality TTS ---
+          const ttsUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+                    
+          // Generate narration text
+          generateText.textContent = '✨ AI導讀生成中...';
+          const selectedLang = voiceLangInput.value;
+                    
+          const systemPromptTTS = `你是一位書籍導讀專家，請根據使用者提供的書籍資訊或情境描述，生成一段約 30-50 字、自然流暢且引人入勝的導讀介紹。請使用「${selectedLang}」語言，風格要「${selectedStyle}」，並且口語化，適合直接朗讀。`;
+          const textGenPayload = { contents: [{ parts: [{ text }] }], systemInstruction: { parts: [{ text: systemPromptTTS }] } };
+
+          const textGenResponse = await fetch(textGenUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(textGenPayload) });
+          if (!textGenResponse.ok) throw new Error(`導讀文字生成失敗: ${textGenResponse.status}`);
+          const textGenResult = await textGenResponse.json();
+          const generatedText = textGenResult.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (!generatedText) throw new Error('無法生成導讀文字。');
+
+          // Generate audio from the text
+          generateText.textContent = '✨ 高品質語音生成中...';
+          const ttsPayload = { contents: [{ parts: [{ text: `用${selectedStyle}的語氣說: ${generatedText}` }] }], generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } } }, model: "gemini-2.5-flash-preview-tts" };
+          const ttsResponse = await fetch(ttsUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(ttsPayload) });
+          if (!ttsResponse.ok) throw new Error(`語音生成失败: ${ttsResponse.status}`);
+          const ttsResult = await ttsResponse.json();
+
+          const audioData = ttsResult.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+          const mimeType = ttsResult.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType;
+
+          if (!audioData || !mimeType || !mimeType.startsWith("audio/")) { throw new Error('API未返回有效的音訊資料。'); }
+
+          const sampleRateMatch = mimeType.match(/rate=(\d+)/);
+          if (!sampleRateMatch) throw new Error('無法從MIME類型中解析取樣率。');
+          const sampleRate = parseInt(sampleRateMatch[1], 10);
+                    
+          const pcmBuffer = base64ToArrayBuffer(audioData);
+          const pcm16 = new Int16Array(pcmBuffer);
+          const wavBlob = pcmToWav(pcm16, sampleRate);
+          const audioUrl = URL.createObjectURL(wavBlob);
+
+          audioPlayerContainer.innerHTML = '';
+          const audio = new Audio(audioUrl);
+          audio.controls = true;
+          audio.className = "w-full";
+          audioPlayerContainer.appendChild(audio);
+          audio.play();
+
+          generateText.textContent = '正在播放...';
+          audio.onended = () => { generateLoader.classList.add('hidden'); generateText.textContent = '🚀 開始生成完整體驗'; generateBtn.disabled = false; };
+
+        } catch (err) {
+          errorMessage.textContent = err.message;
+          generateLoader.classList.add('hidden');
+          generateText.textContent = '🚀 開始生成完整體驗';
+          generateBtn.disabled = false;
+        }
+      });
+
+
+      // --- MOS Chart ---
+      const mosCtx = document.getElementById('mosChart')?.getContext('2d');
+      if (mosCtx) {
+        new Chart(mosCtx, { type: 'bar', data: { labels: ['my-reader-gpt 自然度'], datasets: [{ label: 'MOS (平均意見分數)', data: [4.3], backgroundColor: ['rgba(38, 139, 210, 0.6)'], borderColor: ['rgba(38, 139, 210, 1)'], borderWidth: 1, barPercentage: 0.5 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { beginAtZero: true, max: 5, title: { display: true, text: '分數 (越高越好)' } } }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (context) => `${context.dataset.label || ''}: ${context.parsed.x.toFixed(1)} / 5.0` } } } } });
+      }
+
+      // --- Future Vision Cards Interaction ---
+      const futureCards = document.querySelectorAll('.future-card');
+      futureCards.forEach(card => { card.addEventListener('click', () => { card.classList.toggle('opacity-50'); const checkmark = card.querySelector('.checkmark-wrapper'); if (checkmark) { checkmark.classList.toggle('hidden'); } }); });
+    });
+  </script>
+</body>
+</html>
