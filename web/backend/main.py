@@ -175,3 +175,71 @@ async def list_haptic_patterns():
         "patterns": list(patterns.keys()),
         "total": len(patterns)
     }
+
+
+# Podcast Feature
+class RegistrationRequest(BaseModel):
+    email: str = None
+    vendor_code: str = None
+
+
+class PodcastTTSRequest(BaseModel):
+    text: str
+    voice: str = 'default'
+    lang: str = 'zh-tw'
+
+
+# Simple in-memory storage for demo (in production, use a database)
+registered_users = set()
+valid_vendor_codes = {"VENDOR2025", "DEMO2025", "TEST2025"}
+
+
+@app.post("/podcast/register", summary="Register for Podcast Feature", description="Register with email or unlock with vendor code")
+async def register_podcast(request: RegistrationRequest):
+    """
+    Register for podcast feature access using email or vendor code.
+    
+    - **email**: User email for registration (optional).
+    - **vendor_code**: Vendor-provided code for immediate access (optional).
+    """
+    if request.vendor_code:
+        if request.vendor_code in valid_vendor_codes:
+            return {"success": True, "message": "廠商代碼驗證成功！播客功能已解鎖。", "access_token": request.vendor_code}
+        else:
+            return {"success": False, "message": "無效的廠商代碼。"}
+    
+    if request.email:
+        # Simple email validation
+        if "@" in request.email and "." in request.email:
+            registered_users.add(request.email)
+            return {"success": True, "message": "註冊成功！播客功能已解鎖。", "access_token": request.email}
+        else:
+            return {"success": False, "message": "無效的電子郵件地址。"}
+    
+    return {"success": False, "message": "請提供電子郵件或廠商代碼。"}
+
+
+@app.post("/podcast/tts", summary="Generate Podcast Audio", description="Generate TTS audio for podcast with voice selection")
+async def podcast_tts(request: PodcastTTSRequest):
+    """
+    Generates podcast audio with selected voice.
+    
+    - **text**: The podcast text content.
+    - **voice**: Voice selection (default, male, female, child).
+    - **lang**: Language code.
+    """
+    # Use the TTS engine with voice selection
+    fp = tts_engine.text_to_speech(request.text)
+    return Response(fp.read(), media_type="audio/mpeg")
+
+
+@app.get("/podcast/voices", summary="List Available Voices", description="Get list of available podcast voices")
+async def list_podcast_voices():
+    """
+    Returns available voice options for podcast generation.
+    """
+    voices = tts_engine.get_available_voices()
+    return {
+        "voices": voices,
+        "default": "default"
+    }

@@ -90,6 +90,7 @@
                 <a href="#vision" class="hover:text-gray-200">專案願景</a>
                 <a href="#scenarios" class="hover:text-gray-200">應用情境</a>
                 <a href="#demo" class="hover:text-gray-200">線上原型</a>
+                <a href="#podcast" class="hover:text-gray-200">🎙️ 播客</a>
                 <a href="#engine" class="hover:text-gray-200">HSP引擎</a>
                 <a href="#progress" class="hover:text-gray-200">開發進度</a>
                 <a href="#future" class="hover:text-gray-200">未來展望</a>
@@ -98,6 +99,7 @@
                 <select id="mobile-nav" class="bg-white text-gray-800 rounded p-2">
                     <option value="#hero">首頁</option>
                     <option value="#vision">專案願景</option>
+                    <option value="#podcast">🎙️ 播客</option>
                     <option value="#scenarios">應用情境</option>
                     <option value="#demo">線上原型</option>
                     <option value="#engine">HSP引擎</option>
@@ -268,6 +270,135 @@
                         <div class="result-section mt-4">
                             <h3 class="font-bold text-lg text-purple-600">🧠 知識圖譜分析</h3>
                             <pre id="kg-output" class="mt-2 bg-gray-100 p-4 rounded text-sm overflow-x-auto"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Podcast Feature Section -->
+        <section id="podcast" class="py-16 md:py-24 bg-gradient-to-br from-purple-50 to-blue-50">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl md:text-4xl font-bold">🎙️ AI 播客生成器</h3>
+                    <p class="mt-4 text-lg text-gray-600">將您的文字轉換為專業級播客，支援多種語音風格選擇。</p>
+                </div>
+                
+                <div class="max-w-3xl mx-auto">
+                    <!-- Unlock/Registration Card -->
+                    <div id="podcast-lock-screen" class="bg-white p-8 rounded-lg card-shadow">
+                        <div class="text-center mb-6">
+                            <div class="text-6xl mb-4">🔒</div>
+                            <h4 class="text-2xl font-bold mb-2">解鎖播客功能</h4>
+                            <p class="text-gray-600">首次使用需要註冊或輸入廠商代碼</p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <h5 class="font-bold mb-2">方式一：電子郵件註冊</h5>
+                                <input type="email" id="podcast-email" placeholder="請輸入您的電子郵件" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500">
+                                <button id="podcast-register-btn" class="w-full mt-2 bg-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-700 transition duration-200">
+                                    註冊並解鎖
+                                </button>
+                            </div>
+                            
+                            <div class="text-center text-gray-500">或</div>
+                            
+                            <div>
+                                <h5 class="font-bold mb-2">方式二：廠商代碼</h5>
+                                <input type="text" id="podcast-vendor-code" placeholder="請輸入廠商提供的代碼" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <button id="podcast-unlock-btn" class="w-full mt-2 bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200">
+                                    使用代碼解鎖
+                                </button>
+                            </div>
+                            
+                            <div id="podcast-unlock-message" class="text-center mt-4 font-medium"></div>
+                        </div>
+                        
+                        <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+                            <p class="text-sm text-gray-600">
+                                <strong>💡 提示：</strong> 測試用代碼：DEMO2025, TEST2025, VENDOR2025
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Podcast Generator (Initially Hidden) -->
+                    <div id="podcast-generator" class="hidden">
+                        <div class="bg-white p-8 rounded-lg card-shadow">
+                            <div class="mb-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="text-2xl font-bold">播客內容編輯器</h4>
+                                    <span class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">✓ 已解鎖</span>
+                                </div>
+                                <textarea id="podcast-text-input" placeholder="在這裡輸入您的播客內容..." rows="8" class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-purple-500 transition duration-200 resize-none subtle-bg"></textarea>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <label for="podcast-voice-select" class="block text-sm font-medium text-gray-700 mb-2">語音選擇</label>
+                                    <select id="podcast-voice-select" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500">
+                                        <option value="default">預設語音</option>
+                                        <option value="Kore">Kore (女性，專業)</option>
+                                        <option value="Aoede">Aoede (女性，溫柔)</option>
+                                        <option value="Charon">Charon (男性，沉穩)</option>
+                                        <option value="Fenrir">Fenrir (男性，活潑)</option>
+                                        <option value="Puck">Puck (童音，可愛)</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label for="podcast-lang-select" class="block text-sm font-medium text-gray-700 mb-2">語言選擇</label>
+                                    <select id="podcast-lang-select" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-500">
+                                        <option value="zh-tw">中文 (繁體)</option>
+                                        <option value="zh-cn">中文 (简体)</option>
+                                        <option value="en">English</option>
+                                        <option value="ja">日本語</option>
+                                        <option value="ko">한국어</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <button id="podcast-generate-btn" class="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-white font-bold py-4 px-6 rounded-lg hover:from-purple-600 hover:to-blue-600 transition duration-200 disabled:opacity-50">
+                                <span id="podcast-generate-loader" class="hidden loader inline-block mr-2"></span>
+                                <span id="podcast-generate-text">🎙️ 生成播客音頻</span>
+                            </button>
+                            
+                            <div id="podcast-error-message" class="text-red-600 mt-4 text-center"></div>
+                            
+                            <div id="podcast-player-container" class="mt-6 hidden">
+                                <h5 class="font-bold text-lg mb-3">🎧 播客預覽</h5>
+                                <audio id="podcast-audio-player" controls class="w-full">
+                                    您的瀏覽器不支援音訊播放。
+                                </audio>
+                                <div class="mt-3 flex gap-2">
+                                    <button id="podcast-download-btn" class="flex-1 bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700 transition duration-200">
+                                        💾 下載音頻
+                                    </button>
+                                    <button id="podcast-reset-btn" class="flex-1 bg-gray-400 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-500 transition duration-200">
+                                        🔄 重新生成
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Welcome/First-time Introduction -->
+                        <div id="podcast-intro-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                            <div class="bg-white rounded-lg p-8 max-w-md mx-4">
+                                <div class="text-center">
+                                    <div class="text-6xl mb-4">🎉</div>
+                                    <h4 class="text-2xl font-bold mb-4">歡迎使用播客功能！</h4>
+                                    <p class="text-gray-600 mb-6">
+                                        您已成功解鎖播客生成器！現在您可以：<br/>
+                                        • 將文字轉換為高品質音頻<br/>
+                                        • 選擇多種語音風格<br/>
+                                        • 支援多國語言播客<br/>
+                                        • 下載並分享您的播客
+                                    </p>
+                                    <button id="podcast-intro-close-btn" class="bg-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-700 transition duration-200">
+                                        開始使用
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1003,6 +1134,197 @@
                         checkmark.classList.toggle('hidden');
                     }
                 });
+            });
+
+            // --- Podcast Feature Logic ---
+            const podcastLockScreen = document.getElementById('podcast-lock-screen');
+            const podcastGenerator = document.getElementById('podcast-generator');
+            const podcastIntroModal = document.getElementById('podcast-intro-modal');
+            const podcastEmailInput = document.getElementById('podcast-email');
+            const podcastVendorCodeInput = document.getElementById('podcast-vendor-code');
+            const podcastRegisterBtn = document.getElementById('podcast-register-btn');
+            const podcastUnlockBtn = document.getElementById('podcast-unlock-btn');
+            const podcastUnlockMessage = document.getElementById('podcast-unlock-message');
+            const podcastTextInput = document.getElementById('podcast-text-input');
+            const podcastVoiceSelect = document.getElementById('podcast-voice-select');
+            const podcastLangSelect = document.getElementById('podcast-lang-select');
+            const podcastGenerateBtn = document.getElementById('podcast-generate-btn');
+            const podcastGenerateLoader = document.getElementById('podcast-generate-loader');
+            const podcastGenerateText = document.getElementById('podcast-generate-text');
+            const podcastErrorMessage = document.getElementById('podcast-error-message');
+            const podcastPlayerContainer = document.getElementById('podcast-player-container');
+            const podcastAudioPlayer = document.getElementById('podcast-audio-player');
+            const podcastDownloadBtn = document.getElementById('podcast-download-btn');
+            const podcastResetBtn = document.getElementById('podcast-reset-btn');
+            const podcastIntroCloseBtn = document.getElementById('podcast-intro-close-btn');
+            
+            const BACKEND_API_URL = 'http://127.0.0.1:8000';
+            
+            // Check if already unlocked
+            const podcastUnlocked = localStorage.getItem('podcast_unlocked');
+            const showIntro = localStorage.getItem('podcast_intro_shown');
+            
+            if (podcastUnlocked === 'true') {
+                podcastLockScreen.classList.add('hidden');
+                podcastGenerator.classList.remove('hidden');
+                
+                // Show intro modal if first time
+                if (showIntro !== 'true') {
+                    podcastIntroModal.classList.remove('hidden');
+                }
+            }
+            
+            // Close intro modal
+            podcastIntroCloseBtn.addEventListener('click', () => {
+                podcastIntroModal.classList.add('hidden');
+                localStorage.setItem('podcast_intro_shown', 'true');
+            });
+            
+            // Register with email
+            podcastRegisterBtn.addEventListener('click', async () => {
+                const email = podcastEmailInput.value.trim();
+                if (!email) {
+                    podcastUnlockMessage.textContent = '請輸入電子郵件地址。';
+                    podcastUnlockMessage.className = 'text-center mt-4 font-medium text-red-600';
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`${BACKEND_API_URL}/podcast/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: email })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        podcastUnlockMessage.textContent = data.message;
+                        podcastUnlockMessage.className = 'text-center mt-4 font-medium text-green-600';
+                        localStorage.setItem('podcast_unlocked', 'true');
+                        localStorage.setItem('podcast_access_token', data.access_token);
+                        
+                        setTimeout(() => {
+                            podcastLockScreen.classList.add('hidden');
+                            podcastGenerator.classList.remove('hidden');
+                            podcastIntroModal.classList.remove('hidden');
+                        }, 1500);
+                    } else {
+                        podcastUnlockMessage.textContent = data.message;
+                        podcastUnlockMessage.className = 'text-center mt-4 font-medium text-red-600';
+                    }
+                } catch (err) {
+                    podcastUnlockMessage.textContent = '註冊失敗，請稍後再試。';
+                    podcastUnlockMessage.className = 'text-center mt-4 font-medium text-red-600';
+                }
+            });
+            
+            // Unlock with vendor code
+            podcastUnlockBtn.addEventListener('click', async () => {
+                const vendorCode = podcastVendorCodeInput.value.trim();
+                if (!vendorCode) {
+                    podcastUnlockMessage.textContent = '請輸入廠商代碼。';
+                    podcastUnlockMessage.className = 'text-center mt-4 font-medium text-red-600';
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`${BACKEND_API_URL}/podcast/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ vendor_code: vendorCode })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        podcastUnlockMessage.textContent = data.message;
+                        podcastUnlockMessage.className = 'text-center mt-4 font-medium text-green-600';
+                        localStorage.setItem('podcast_unlocked', 'true');
+                        localStorage.setItem('podcast_access_token', data.access_token);
+                        
+                        setTimeout(() => {
+                            podcastLockScreen.classList.add('hidden');
+                            podcastGenerator.classList.remove('hidden');
+                            podcastIntroModal.classList.remove('hidden');
+                        }, 1500);
+                    } else {
+                        podcastUnlockMessage.textContent = data.message;
+                        podcastUnlockMessage.className = 'text-center mt-4 font-medium text-red-600';
+                    }
+                } catch (err) {
+                    podcastUnlockMessage.textContent = '驗證失敗，請稍後再試。';
+                    podcastUnlockMessage.className = 'text-center mt-4 font-medium text-red-600';
+                }
+            });
+            
+            // Generate podcast audio
+            let currentPodcastBlob = null;
+            
+            podcastGenerateBtn.addEventListener('click', async () => {
+                const text = podcastTextInput.value.trim();
+                if (!text) {
+                    podcastErrorMessage.textContent = '請輸入播客內容。';
+                    return;
+                }
+                
+                podcastErrorMessage.textContent = '';
+                podcastPlayerContainer.classList.add('hidden');
+                podcastGenerateBtn.disabled = true;
+                podcastGenerateLoader.classList.remove('hidden');
+                podcastGenerateText.textContent = '正在生成播客音頻...';
+                
+                try {
+                    const voice = podcastVoiceSelect.value;
+                    const lang = podcastLangSelect.value;
+                    
+                    const response = await fetch(`${BACKEND_API_URL}/podcast/tts`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: text, voice: voice, lang: lang })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`生成失敗，狀態碼: ${response.status}`);
+                    }
+                    
+                    const blob = await response.blob();
+                    currentPodcastBlob = blob;
+                    const audioUrl = URL.createObjectURL(blob);
+                    
+                    podcastAudioPlayer.src = audioUrl;
+                    podcastPlayerContainer.classList.remove('hidden');
+                    podcastAudioPlayer.play();
+                    
+                    podcastGenerateText.textContent = '🎙️ 生成播客音頻';
+                } catch (err) {
+                    podcastErrorMessage.textContent = `生成失敗: ${err.message}`;
+                } finally {
+                    podcastGenerateBtn.disabled = false;
+                    podcastGenerateLoader.classList.add('hidden');
+                }
+            });
+            
+            // Download podcast audio
+            podcastDownloadBtn.addEventListener('click', () => {
+                if (currentPodcastBlob) {
+                    const url = URL.createObjectURL(currentPodcastBlob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `podcast_${Date.now()}.mp3`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }
+            });
+            
+            // Reset podcast generator
+            podcastResetBtn.addEventListener('click', () => {
+                podcastTextInput.value = '';
+                podcastPlayerContainer.classList.add('hidden');
+                podcastErrorMessage.textContent = '';
+                currentPodcastBlob = null;
             });
         });
     </script>
