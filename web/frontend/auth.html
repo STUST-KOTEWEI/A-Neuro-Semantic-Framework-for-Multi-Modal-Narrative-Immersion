@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>登入 / 註冊</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial; padding: 30px; }
+    input { display:block; margin: 8px 0; padding: 8px; width: 300px; }
+    button { padding: 8px 12px; margin-right: 10px; }
+    .ok { color: green; }
+    .err { color: red; }
+  </style>
+  <script>
+    const API_BASE = 'http://localhost:8010';
+    async function register() {
+      const email = document.getElementById('r_email').value;
+      const username = document.getElementById('r_username').value;
+      const password = document.getElementById('r_password').value;
+      const res = await fetch(`${API_BASE}/auth/register`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, username, password }) });
+      const data = await res.json();
+      document.getElementById('reg_result').textContent = JSON.stringify(data, null, 2);
+      if (data.token) { localStorage.setItem('token', data.token); }
+    }
+    async function login() {
+      const email = document.getElementById('l_email').value;
+      const username = document.getElementById('l_username').value;
+      const password = document.getElementById('l_password').value;
+      const res = await fetch(`${API_BASE}/auth/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: email || null, username: username || null, password }) });
+      const data = await res.json();
+      document.getElementById('login_result').textContent = JSON.stringify(data, null, 2);
+      if (data.token) { localStorage.setItem('token', data.token); }
+    }
+  </script>
+</head>
+<body>
+  <h1>登入 / 註冊</h1>
+  <h2>註冊</h2>
+  <input id="r_email" placeholder="Email" />
+  <input id="r_username" placeholder="帳號" />
+  <input id="r_password" placeholder="密碼" type="password" />
+  <button onclick="register()">註冊</button>
+  <pre id="reg_result"></pre>
+
+  <h2>登入</h2>
+  <input id="l_email" placeholder="Email (或留空)" />
+  <input id="l_username" placeholder="帳號 (或留空)" />
+  <input id="l_password" placeholder="密碼" type="password" />
+  <button onclick="login()">登入</button>
+  <pre id="login_result"></pre>
+</body>
+</html>

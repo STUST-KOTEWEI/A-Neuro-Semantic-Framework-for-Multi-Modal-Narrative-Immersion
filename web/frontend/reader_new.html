@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Modern Reader - 現代閱讀器</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;background:#0a0e27;color:#e2e8f0;line-height:1.5}
+    .container{max-width:420px;margin:0 auto;padding:1rem;min-height:100vh}
+    .header{text-align:center;margin-bottom:2rem;padding-top:2rem}
+    .logo{font-size:1.75rem;font-weight:700;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.5rem}
+    .tagline{font-size:.85rem;color:#94a3b8;margin-bottom:1.5rem}
+    .card{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+    .tabs{display:flex;background:#0f172a;border-radius:12px;padding:.25rem;margin-bottom:1.5rem}
+    .tab{flex:1;text-align:center;padding:.75rem;border-radius:10px;font-weight:600;font-size:.9rem;cursor:pointer;transition:all .2s}
+    .tab.active{background:#2563eb;color:#fff;transform:translateY(-1px)}
+    .form-group{margin-bottom:1rem}
+    label{display:block;font-size:.8rem;font-weight:600;margin-bottom:.5rem;color:#cbd5e1}
+    input,select,textarea{width:100%;border:2px solid #334155;border-radius:10px;background:#0f172a;color:#e2e8f0;padding:.75rem;font-size:.9rem;transition:border-color .2s}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+    .btn{width:100%;border:none;background:linear-gradient(135deg,#2563eb 0%,#3b82f6 100%);color:#fff;padding:.85rem;border-radius:12px;font-weight:600;font-size:.9rem;cursor:pointer;transition:all .2s}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,99,235,.3)}
+    .btn.sec{background:#475569}
+    .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .alert{padding:.75rem;border-radius:10px;margin-bottom:1rem;font-size:.85rem;display:none}
+    .alert.error{background:#7f1d1d;color:#fca5a5;border:1px solid #991b1b}
+    .alert.success{background:#14532d;color:#86efac;border:1px solid #166534}
+    .user-panel{display:none}
+    .user-info{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem}
+    .status-badge{padding:.25rem .6rem;border-radius:20px;font-size:.7rem;font-weight:600}
+    .status-free{background:#475569;color:#e2e8f0}
+    .status-pro{background:#fbbf24;color:#1f2937}
+    .feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:1.5rem 0}
+    .feature-btn{background:#334155;border:none;color:#e2e8f0;padding:.75rem;border-radius:10px;font-size:.8rem;cursor:pointer;transition:all .2s}
+    .feature-btn:hover{background:#475569;transform:translateY(-1px)}
+    .debug-panel{background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:1rem;margin-top:1rem}
+    .debug-log{font-family:ui-monospace,monospace;font-size:.7rem;max-height:150px;overflow-y:auto;white-space:pre-wrap;color:#94a3b8}
+    .footer{text-align:center;margin-top:2rem;padding:1rem;font-size:.7rem;color:#64748b}
+    .hidden{display:none !important}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header style="padding:1.5rem 0 1rem 0;text-align:center">
+      <h1 style="font-size:2rem;font-weight:700;color:#2563eb;margin-bottom:.5rem">Modern Reader</h1>
+      <div style="color:#64748b;font-size:.95rem">現代閱讀 • 智能分析 • 多感官體驗</div>
+    </header>
+
+    <nav style="display:flex;justify-content:center;gap:2rem;margin-bottom:2rem">
+      <button class="btn" id="navHome">首頁</button>
+      <button class="btn" id="navFeatures">功能</button>
+      <button class="btn" id="navLogin">登入/註冊</button>
+    </nav>
+
+    <main id="mainHome">
+      <section style="max-width:600px;margin:0 auto;text-align:left;padding:1rem 0">
+        <h2 style="font-size:1.3rem;color:#2563eb;margin-bottom:.5rem">歡迎使用 Modern Reader</h2>
+        <p style="color:#94a3b8;margin-bottom:1.5rem">本平台提供多感官 AI 閱讀體驗，支援 NLP 分析、RAG 搜圖、語音錄音/播放、ISBN 封面查詢與數據記錄。可直接瀏覽功能，或選擇登入以解鎖進階功能。</p>
+        <ul style="list-style:disc inside;color:#e2e8f0;font-size:.98rem">
+          <li>無需註冊即可體驗大部分功能</li>
+          <li>登入後可保存個人化紀錄與進階查詢</li>
+        </ul>
+      </section>
+    </main>
+
+    <main id="mainFeatures" style="display:none">
+      <section style="max-width:600px;margin:0 auto;padding:1rem 0">
+        <h2 style="font-size:1.2rem;color:#2563eb;margin-bottom:1rem">功能列表</h2>
+        <div style="display:flex;flex-direction:column;gap:1rem">
+          <button class="btn" id="btnNLP">📝 NLP分析</button>
+          <button class="btn" id="btnRAG">🔍 RAG搜圖</button>
+          <button class="btn" id="btnSTT">🎙️ STT錄音</button>
+          <button class="btn" id="btnTTS">🔊 TTS播放</button>
+          <button class="btn" id="btnISBN">📚 ISBN封面</button>
+          <button class="btn" id="btnData">📊 數據記錄</button>
+        </div>
+      </section>
+    </main>
+
+    <main id="mainLogin" style="display:none">
+      <section style="max-width:400px;margin:0 auto;padding:1rem 0">
+        <h2 style="font-size:1.2rem;color:#2563eb;margin-bottom:1rem">登入 / 註冊</h2>
+        <div id="alertBox" class="alert"></div>
+        <form id="loginForm">
+          <div class="form-group">
+            <label>帳號 (Email 或 Username)</label>
+            <input id="loginId" placeholder="輸入 email 或 username" />
+          </div>
+          <div class="form-group">
+            <label>密碼</label>
+            <input id="loginPwd" type="password" />
+          </div>
+          <button type="submit" class="btn">登入</button>
+          <button type="button" class="btn sec" id="quickFill" style="margin-top:.5rem">測試帳號</button>
+        </form>
+        <form id="registerForm" class="hidden">
+          <div class="form-group">
+            <label>Email</label>
+            <input id="regEmail" type="email" />
+          </div>
+          <div class="form-group">
+            <label>Username</label>
+            <input id="regUsername" />
+          </div>
+          <div class="form-group">
+            <label>密碼</label>
+            <input id="regPassword" type="password" />
+          </div>
+          <div class="form-group">
+            <label>訂閱方案</label>
+            <select id="regTier">
+              <option value="free">Free</option>
+              <option value="plus">Plus</option>
+              <option value="pro">Pro</option>
+            </select>
+          </div>
+          <button type="submit" class="btn">建立帳號</button>
+        </form>
+        <div style="text-align:center;margin-top:1rem;color:#94a3b8;font-size:.85rem">
+          <span>或直接以 <b>訪客</b> 身份瀏覽功能</span>
+        </div>
+      </section>
+    </main>
+
+    <div class="debug-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+        <span style="font-size:.8rem;font-weight:600">Debug Log</span>
+        <button class="btn sec" id="clearLog" style="padding:.25rem .5rem;font-size:.7rem">清除</button>
+      </div>
+      <div class="debug-log" id="debugLog"></div>
+    </div>
+
+    <footer class="footer">
+      Modern Reader v2.0 • <a href="/health" style="color:#38bdf8">Health Check</a>
+    </footer>
+  </div>
+              <button class="btn sec" id="clearLog" style="padding:.25rem .5rem;font-size:.7rem">清除</button>
+            </div>
+            <div class="debug-log" id="debugLog"></div>
+          </div>
+
+          <div class="footer">
+            Modern Reader v2.0 • 輕量版 • <a href="/health" style="color:#38bdf8">Health Check</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ...existing code... -->
+    <script>
+    // ...原本 JS 內容放這裡...
+    const $ = s => document.querySelector(s);
+    const log = (...args) => {
+      const msg = args.map(a => typeof a === 'object' ? JSON.stringify(a) : a).join(' ');
+      $('#debugLog').textContent += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
+      $('#debugLog').scrollTop = $('#debugLog').scrollHeight;
+    };
+    const showAlert = (msg, type = 'error') => {
+      const alert = $('#alertBox');
+      alert.textContent = msg;
+      alert.className = `alert ${type}`;
+      alert.style.display = 'block';
+      setTimeout(() => alert.style.display = 'none', 5000);
+    };
+    
+    // API 基礎路徑自動偵測（本地測試用）
+    const API_BASE = window.location.port === '8010' ? '' : 'http://localhost:8010';
+    
+    let token = null;
+    let user = null;
+    
+    // 等待 DOM 完全載入
+    document.addEventListener('DOMContentLoaded', () => {
+      log(`API 基礎路徑: ${API_BASE || '(相對路徑)'}`);
+      
+      // 導航功能
+      $('#navHome')?.addEventListener('click', () => {
+        $('#mainHome').style.display = 'block';
+        $('#mainFeatures').style.display = 'none';
+        $('#mainLogin').style.display = 'none';
+        log('導航至：首頁');
+      });
+      
+      $('#navFeatures')?.addEventListener('click', () => {
+        $('#mainHome').style.display = 'none';
+        $('#mainFeatures').style.display = 'block';
+        $('#mainLogin').style.display = 'none';
+        log('導航至：功能列表');
+      });
+      
+      $('#navLogin')?.addEventListener('click', () => {
+        $('#mainHome').style.display = 'none';
+        $('#mainFeatures').style.display = 'none';
+        $('#mainLogin').style.display = 'block';
+        log('導航至：登入/註冊');
+      });
+      
+      // 功能按鈕 - 從 SQL 讀取並顯示實際數據
+      
+      // 📝 NLP分析 - 從 SQL 讀取 NLP 分析結果
+      $('#btnNLP')?.addEventListener('click', async () => {
+        log('正在從 SQL 讀取 NLP 分析結果...');
+        try {
+          const resp = await fetch(`${API_BASE}/data/nlp`);
+          if (!resp.ok) throw new Error(`API 回應失敗: ${resp.status}`);
+          const data = await resp.json();
+          log('=== NLP 分析結果 ===');
+          data.data.forEach(item => {
+            log(`文本: "${item.text}"`);
+            log(`分析類型: ${item.analysis_type}`);
+            log(`結果: ${JSON.stringify(item.result, null, 2)}`);
+            log('---');
+          });
+          showAlert(`已載入 ${data.data.length} 筆 NLP 分析結果`, 'success');
+        } catch (e) {
+          log('讀取 NLP 數據失敗:', e.message);
+          showAlert('讀取 NLP 數據失敗', 'error');
+        }
+      });
+      
+      // 🔍 RAG搜圖 - 從 SQL 讀取圖像數據
+      $('#btnRAG')?.addEventListener('click', async () => {
+        log('正在從 SQL 讀取 RAG 圖像數據...');
+        try {
+          const resp = await fetch(`${API_BASE}/data/rag-images`);
+          if (!resp.ok) throw new Error(`API 回應失敗: ${resp.status}`);
+          const data = await resp.json();
+          log('=== RAG 搜圖結果 ===');
+          data.data.forEach(item => {
+            log(`查詢: "${item.query}"`);
+            log(`圖片 URL: ${item.image_url}`);
+            log(`描述: ${item.description}`);
+            log(`相關度: ${item.relevance_score}`);
+            log('---');
+          });
+          showAlert(`已載入 ${data.data.length} 張圖像數據`, 'success');
+        } catch (e) {
+          log('讀取 RAG 圖像失敗:', e.message);
+          showAlert('讀取 RAG 圖像失敗', 'error');
+        }
+      });
+      
+      // 🎙️ STT錄音 - 從 SQL 讀取情感偵測數據
+      $('#btnSTT')?.addEventListener('click', async () => {
+        log('正在從 SQL 讀取情感偵測數據...');
+        try {
+          const resp = await fetch(`${API_BASE}/data/emotions`);
+          if (!resp.ok) throw new Error(`API 回應失敗: ${resp.status}`);
+          const data = await resp.json();
+          log('=== 情感偵測結果 ===');
+          data.data.forEach(item => {
+            log(`文本: "${item.audio_text}"`);
+            log(`情感: ${item.emotion} (信心度: ${(item.confidence * 100).toFixed(1)}%)`);
+            log(`時間: ${item.timestamp}`);
+            log('---');
+          });
+          showAlert(`已載入 ${data.data.length} 筆情感偵測數據`, 'success');
+        } catch (e) {
+          log('讀取情感數據失敗:', e.message);
+          showAlert('讀取情感數據失敗', 'error');
+        }
+      });
+      
+      // 🔊 TTS播放 - 從 SQL 讀取播客內容
+      $('#btnTTS')?.addEventListener('click', async () => {
+        log('正在從 SQL 讀取播客內容...');
+        try {
+          const resp = await fetch(`${API_BASE}/data/podcasts`);
+          if (!resp.ok) throw new Error(`API 回應失敗: ${resp.status}`);
+          const data = await resp.json();
+          log('=== 播客內容列表 ===');
+          data.data.forEach(item => {
+            log(`標題: ${item.title}`);
+            log(`內容: ${item.content}`);
+            log(`音訊 URL: ${item.audio_url}`);
+            log(`時長: ${Math.floor(item.duration / 60)} 分 ${item.duration % 60} 秒`);
+            log('---');
+          });
+          showAlert(`已載入 ${data.data.length} 個播客內容`, 'success');
+        } catch (e) {
+          log('讀取播客內容失敗:', e.message);
+          showAlert('讀取播客內容失敗', 'error');
+        }
+      });
+      
+      // 📚 ISBN封面 - 從 SQL 讀取書籍封面圖像
+      $('#btnISBN')?.addEventListener('click', async () => {
+        log('正在從 SQL 讀取書籍封面數據...');
+        try {
+          const resp = await fetch(`${API_BASE}/data/book-covers`);
+          if (!resp.ok) throw new Error(`API 回應失敗: ${resp.status}`);
+          const data = await resp.json();
+          log('=== 書籍封面列表 ===');
+          data.data.forEach(item => {
+            log(`ISBN: ${item.isbn}`);
+            log(`書名: ${item.title}`);
+            log(`作者: ${item.author}`);
+            log(`封面圖: ${item.cover_image_url}`);
+            log(`簡介: ${item.description}`);
+            log('---');
+          });
+          showAlert(`已載入 ${data.data.length} 本書籍封面`, 'success');
+        } catch (e) {
+          log('讀取書籍封面失敗:', e.message);
+          showAlert('讀取書籍封面失敗', 'error');
+        }
+      });
+      
+      // 📊 數據記錄 - 從 SQL 讀取用戶數據
+      $('#btnData')?.addEventListener('click', async () => {
+        log('正在從 SQL 讀取用戶數據...');
+        try {
+          const resp = await fetch(`${API_BASE}/data/users`);
+          if (!resp.ok) throw new Error(`API 回應失敗: ${resp.status}`);
+          const data = await resp.json();
+          log('=== 用戶數據列表 ===');
+          data.data.forEach(item => {
+            log(`ID: ${item.id} | ${item.username} (${item.email})`);
+            log(`訂閱方案: ${item.subscription_tier}`);
+            log('---');
+          });
+          showAlert(`已載入 ${data.data.length} 筆用戶數據`, 'success');
+        } catch (e) {
+          log('讀取用戶數據失敗:', e.message);
+          showAlert('讀取用戶數據失敗', 'error');
+        }
+      });
+      
+      // 清除 log 按鈕
+      $('#clearLog')?.addEventListener('click', () => {
+        $('#debugLog').textContent = '';
+        log('Debug log 已清除');
+      });
+      
+      log('頁面已載入，所有功能已初始化');
+    });
+    </script>
+</body>
+</html>

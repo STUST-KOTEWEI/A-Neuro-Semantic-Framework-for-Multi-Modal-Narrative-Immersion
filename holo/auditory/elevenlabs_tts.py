@@ -81,8 +81,8 @@ class ElevenLabsTTS:
         self,
         text: str,
         voice_id: Optional[str] = None,
-        **kwargs
-    ):
+        **kwargs: Any
+    ) -> Any:
         """
         Stream audio generation for real-time playback.
         
@@ -137,7 +137,7 @@ class ElevenLabsTTSFallback:
     Uses gTTS as a fallback option with similar interface.
     """
     
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize fallback TTS."""
         self.is_fallback = True
         
@@ -149,7 +149,7 @@ class ElevenLabsTTSFallback:
         self,
         text: str,
         voice_id: Optional[str] = None,
-        **kwargs
+        **kwargs: Any
     ) -> io.BytesIO:
         """
         Convert text to speech using gTTS as fallback.
@@ -162,7 +162,7 @@ class ElevenLabsTTSFallback:
         Returns:
             BytesIO object containing audio data
         """
-        from gtts import gTTS
+        from gtts import gTTS  # type: ignore
         
         tts = gTTS(text=text, lang='en')
         fp = io.BytesIO()
@@ -201,7 +201,7 @@ def get_tts_engine(api_key: Optional[str] = None) -> Any:
     if elevenlabs_tts.is_available():
         try:
             # Try to import elevenlabs to verify it's installed
-            import elevenlabs
+            import elevenlabs  # type: ignore
             return elevenlabs_tts
         except ImportError:
             # Package not installed, use fallback

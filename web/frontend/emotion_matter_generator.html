@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>情緒驅動可編程物質生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .camera-panel {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .camera-panel h2 {
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        #videoElement {
+            width: 100%;
+            height: 300px;
+            background: #000;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        #capturedCanvas {
+            display: none;
+        }
+
+        .camera-controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #fff;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #eb3349, #f45c43);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .emotion-display {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+
+        .emotion-display h3 {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .emotion-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .emotion-item:last-child {
+            border-bottom: none;
+        }
+
+        .intensity-bar {
+            width: 200px;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .intensity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #38ef7d, #11998e);
+            transition: width 0.5s ease;
+        }
+
+        .generation-panel {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .generation-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.9);
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .images-section {
+            margin-top: 20px;
+        }
+
+        .images-section h3 {
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .source-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: 600;
+        }
+
+        .badge-rag {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .badge-gemini {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .image-card {
+            position: relative;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .image-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .image-info {
+            padding: 10px;
+            font-size: 0.85em;
+        }
+
+        .image-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .tag {
+            padding: 2px 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            font-size: 0.75em;
+        }
+
+        .matter-canvas-container {
+            margin-top: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        #matterCanvas {
+            width: 100%;
+            height: 400px;
+            border-radius: 10px;
+            background: #000;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎭 情緒驅動可編程物質生成器</h1>
+
+        <div class="main-grid">
+            <!-- 左側：鏡頭 + 表情檢測 -->
+            <div class="camera-panel">
+                <h2>📷 鏡頭表情檢測</h2>
+                <video id="videoElement" autoplay playsinline></video>
+                <canvas id="capturedCanvas"></canvas>
+
+                <div class="camera-controls">
+                    <button class="btn btn-primary" id="startCameraBtn">啟動鏡頭</button>
+                    <button class="btn btn-success" id="captureBtn" disabled>捕獲表情</button>
+                </div>
+
+                <div class="emotion-display hidden" id="emotionDisplay">
+                    <h3>檢測到的情緒</h3>
+                    <div class="emotion-item">
+                        <span>主要情緒：</span>
+                        <strong id="primaryEmotion">-</strong>
+                    </div>
+                    <div class="emotion-item">
+                        <span>強度：</span>
+                        <span id="intensityValue">-</span>
+                    </div>
+                    <div class="intensity-bar">
+                        <div class="intensity-fill" id="intensityBar" style="width: 0%"></div>
+                    </div>
+                    <div class="emotion-item">
+                        <span>次要情緒：</span>
+                        <span id="secondaryEmotions">-</span>
+                    </div>
+                    <div class="emotion-item">
+                        <span>表情特徵：</span>
+                        <span id="facialFeatures">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側：生成控制 -->
+            <div class="generation-panel">
+                <h2>🎨 內容生成控制</h2>
+                
+                <div class="generation-controls">
+                    <div class="form-group">
+                        <label for="queryInput">查詢主題：</label>
+                        <input type="text" id="queryInput" placeholder="例如：未來科技、自然風景" value="未來科技">
+                    </div>
+                    <div class="form-group">
+                        <label for="totalCountInput">總圖像數：</label>
+                        <input type="number" id="totalCountInput" min="50" max="200" value="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="ragLimitInput">RAG 圖像數：</label>
+                        <input type="number" id="ragLimitInput" min="10" max="50" value="50" readonly>
+                    </div>
+                </div>
+
+                <button class="btn btn-success" id="generateBtn" style="width: 100%; padding: 15px; font-size: 18px;" disabled>
+                    🚀 開始生成（先捕獲表情）
+                </button>
+
+                <div class="progress-bar hidden" id="progressBar">
+                    <div class="progress-fill" id="progressFill">0%</div>
+                </div>
+
+                <div class="stats-grid hidden" id="statsGrid">
+                    <div class="stat-card">
+                        <div class="stat-label">總圖像</div>
+                        <div class="stat-value" id="statTotal">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">RAG 生成</div>
+                        <div class="stat-value" id="statRAG">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Gemini 補充</div>
+                        <div class="stat-value" id="statGemini">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">情緒強度</div>
+                        <div class="stat-value" id="statIntensity">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 可編程物質視覺化 -->
+        <div class="matter-canvas-container hidden" id="matterContainer">
+            <h2>🌊 可編程物質模擬</h2>
+            <canvas id="matterCanvas"></canvas>
+            <div style="margin-top: 10px; font-size: 0.9em; opacity: 0.8;">
+                物質參數根據檢測到的情緒動態調整：密度、黏度、顏色、運動模式
+            </div>
+        </div>
+
+        <!-- RAG 生成的圖像 -->
+        <div class="images-section hidden" id="ragSection">
+            <h3>
+                <span class="source-badge badge-rag">RAG</span>
+                RAG 生成圖像（前 50 張）
+            </h3>
+            <div class="images-grid" id="ragImagesGrid"></div>
+        </div>
+
+        <!-- Gemini 生成的圖像 -->
+        <div class="images-section hidden" id="geminiSection">
+            <h3>
+                <span class="source-badge badge-gemini">Gemini AI</span>
+                Google Gemini 補充生成
+            </h3>
+            <div class="images-grid" id="geminiImagesGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8010';
+        let videoStream = null;
+        let currentEmotion = null;
+        let matterAnimation = null;
+
+        // DOM 元素
+        const videoElement = document.getElementById('videoElement');
+        const capturedCanvas = document.getElementById('capturedCanvas');
+        const startCameraBtn = document.getElementById('startCameraBtn');
+        const captureBtn = document.getElementById('captureBtn');
+        const generateBtn = document.getElementById('generateBtn');
+        const emotionDisplay = document.getElementById('emotionDisplay');
+
+        // 啟動鏡頭
+        startCameraBtn.addEventListener('click', async () => {
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: 640, height: 480 },
+                    audio: false
+                });
+                videoElement.srcObject = videoStream;
+                startCameraBtn.textContent = '✓ 鏡頭已啟動';
+                startCameraBtn.disabled = true;
+                captureBtn.disabled = false;
+            } catch (error) {
+                alert('無法啟動鏡頭：' + error.message);
+            }
+        });
+
+        // 捕獲表情
+        captureBtn.addEventListener('click', async () => {
+            capturedCanvas.width = videoElement.videoWidth;
+            capturedCanvas.height = videoElement.videoHeight;
+            const ctx = capturedCanvas.getContext('2d');
+            ctx.drawImage(videoElement, 0, 0);
+
+            const imageData = capturedCanvas.toDataURL('image/jpeg', 0.8);
+            const base64 = imageData.split(',')[1];
+
+            captureBtn.disabled = true;
+            captureBtn.textContent = '🔍 分析中...';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/detect-emotion`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image_base64: base64 })
+                });
+
+                const result = await response.json();
+                currentEmotion = result;
+
+                displayEmotion(result);
+                generateBtn.disabled = false;
+                generateBtn.textContent = `🚀 開始生成（基於 ${result.primary_emotion} 情緒）`;
+                captureBtn.textContent = '✓ 表情已捕獲';
+
+            } catch (error) {
+                alert('表情檢測失敗：' + error.message);
+                captureBtn.disabled = false;
+                captureBtn.textContent = '捕獲表情';
+            }
+        });
+
+        // 顯示情緒
+        function displayEmotion(emotion) {
+            emotionDisplay.classList.remove('hidden');
+            document.getElementById('primaryEmotion').textContent = emotion.primary_emotion;
+            document.getElementById('intensityValue').textContent = (emotion.intensity * 100).toFixed(0) + '%';
+            document.getElementById('intensityBar').style.width = (emotion.intensity * 100) + '%';
+            document.getElementById('secondaryEmotions').textContent = emotion.secondary_emotions?.join(', ') || '無';
+            document.getElementById('facialFeatures').textContent = emotion.facial_features || '分析中...';
+        }
+
+        // 開始生成
+        generateBtn.addEventListener('click', async () => {
+            if (!currentEmotion) {
+                alert('請先捕獲表情！');
+                return;
+            }
+
+            const query = document.getElementById('queryInput').value;
+            const totalCount = parseInt(document.getElementById('totalCountInput').value);
+
+            generateBtn.disabled = true;
+            generateBtn.textContent = '⏳ 生成中...';
+
+            document.getElementById('progressBar').classList.remove('hidden');
+            updateProgress(10, '準備中...');
+
+            try {
+                // 捕獲當前影像
+                const imageData = capturedCanvas.toDataURL('image/jpeg', 0.8);
+                const base64 = imageData.split(',')[1];
+
+                updateProgress(20, '搜尋代表圖...');
+
+                let result = null;
+                try {
+                    const response = await fetch(`${API_BASE}/api/generate-complete`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ camera_image_base64: base64, query: query, total_count: 1 })
+                    });
+                    if (response.status === 410) {
+                        // fallback to RAG search one image
+                        const s = await fetch(`${API_BASE}/data/rag-images/search?q=${encodeURIComponent(query)}&top_k=1`);
+                        const data = await s.json();
+                        result = { statistics: { total_images: data.count, rag_images: data.count, gemini_images: 0 }, emotion: { intensity: currentEmotion.intensity }, rag_images: data.data, gemini_images: [], all_images: data.data.map(d => ({ url: d.image_url, caption: d.description || d.query, source: 'RAG' })) };
+                        updateProgress(60, '已取得代表圖');
+                    } else if (response.ok) {
+                        result = await response.json();
+                    } else {
+                        throw new Error('舊端點回應失敗');
+                    }
+                } catch (e) {
+                    // network error → fallback
+                    const s = await fetch(`${API_BASE}/data/rag-images/search?q=${encodeURIComponent(query)}&top_k=1`);
+                    const data = await s.json();
+                    result = { statistics: { total_images: data.count, rag_images: data.count, gemini_images: 0 }, emotion: { intensity: currentEmotion.intensity }, rag_images: data.data, gemini_images: [], all_images: data.data.map(d => ({ url: d.image_url, caption: d.description || d.query, source: 'RAG' })) };
+                    updateProgress(60, '已取得代表圖');
+                }
+
+                updateProgress(80, '渲染代表圖...');
+
+                displayResults(result);
+
+                updateProgress(100, '✓ 完成！');
+
+                setTimeout(() => {
+                    document.getElementById('progressBar').classList.add('hidden');
+                }, 2000);
+
+                generateBtn.textContent = '🔄 重新生成';
+                generateBtn.disabled = false;
+
+            } catch (error) {
+                alert('生成失敗：' + error.message);
+                generateBtn.disabled = false;
+                generateBtn.textContent = '🚀 開始生成';
+            }
+        });
+
+        function updateProgress(percent, text) {
+            const fill = document.getElementById('progressFill');
+            fill.style.width = percent + '%';
+            fill.textContent = text;
+        }
+
+        function displayResults(result) {
+            // 顯示統計
+            document.getElementById('statsGrid').classList.remove('hidden');
+            document.getElementById('statTotal').textContent = result.statistics.total_images;
+            document.getElementById('statRAG').textContent = result.statistics.rag_images;
+            document.getElementById('statGemini').textContent = result.statistics.gemini_images;
+            document.getElementById('statIntensity').textContent = (result.emotion.intensity * 100).toFixed(0) + '%';
+
+            // 顯示 RAG 圖像
+            if (result.rag_images.length > 0) {
+                document.getElementById('ragSection').classList.remove('hidden');
+                const grid = document.getElementById('ragImagesGrid');
+                grid.innerHTML = '';
+                result.rag_images.forEach(img => {
+                    grid.appendChild(createImageCard(img));
+                });
+            }
+
+            // 顯示 Gemini 圖像
+            if (result.gemini_images.length > 0) {
+                document.getElementById('geminiSection').classList.remove('hidden');
+                const grid = document.getElementById('geminiImagesGrid');
+                grid.innerHTML = '';
+                result.gemini_images.forEach(img => {
+                    grid.appendChild(createImageCard(img));
+                });
+            }
+
+            // 啟動可編程物質模擬
+            document.getElementById('matterContainer').classList.remove('hidden');
+            startMatterSimulation(result.programmable_matter_config);
+        }
+
+        function createImageCard(imageData) {
+            const card = document.createElement('div');
+            card.className = 'image-card';
+
+            const img = document.createElement('img');
+            img.src = imageData.url;
+            img.alt = imageData.caption;
+            img.loading = 'lazy';
+
+            const info = document.createElement('div');
+            info.className = 'image-info';
+            info.innerHTML = `
+                <div><strong>${imageData.caption?.substring(0, 30) || 'Image'}...</strong></div>
+                <div class="image-tags">
+                    ${(imageData.tags || []).slice(0, 3).map(tag => 
+                        `<span class="tag">${tag}</span>`
+                    ).join('')}
+                </div>
+            `;
+
+            card.appendChild(img);
+            card.appendChild(info);
+
+            // 點擊顯示完整資訊
+            card.addEventListener('click', () => {
+                alert(`圖像資訊：\n\n${JSON.stringify(imageData, null, 2)}`);
+            });
+
+            return card;
+        }
+
+        function startMatterSimulation(config) {
+            const canvas = document.getElementById('matterCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = 400;
+
+            const params = config.global_params;
+            const emotion = config.emotion_base;
+
+            let particles = [];
+            const particleCount = params.particle_count || 500;
+
+            // 初始化粒子
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: (Math.random() - 0.5) * 2,
+                    size: Math.random() * 3 + 1
+                });
+            }
+
+            // 取消之前的動畫
+            if (matterAnimation) {
+                cancelAnimationFrame(matterAnimation);
+            }
+
+            function animate() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                const color = params.color || [200, 200, 200];
+                const motionPattern = params.motion_pattern;
+                const speed = params.transformation_speed || 0.5;
+                const viscosity = params.viscosity || 0.5;
+
+                particles.forEach((p, i) => {
+                    // 根據運動模式更新位置
+                    switch(motionPattern) {
+                        case 'bubble':
+                            p.vy -= 0.1 * speed;
+                            break;
+                        case 'drip':
+                            p.vy += 0.2 * speed;
+                            break;
+                        case 'spike':
+                            const angle = Math.atan2(canvas.height/2 - p.y, canvas.width/2 - p.x);
+                            p.vx += Math.cos(angle) * 0.3 * speed;
+                            p.vy += Math.sin(angle) * 0.3 * speed;
+                            break;
+                        case 'scatter':
+                            p.vx += (Math.random() - 0.5) * speed;
+                            p.vy += (Math.random() - 0.5) * speed;
+                            break;
+                        case 'burst':
+                            const dist = Math.hypot(p.x - canvas.width/2, p.y - canvas.height/2);
+                            if (dist < 200) {
+                                const pushAngle = Math.atan2(p.y - canvas.height/2, p.x - canvas.width/2);
+                                p.vx += Math.cos(pushAngle) * 0.5 * speed;
+                                p.vy += Math.sin(pushAngle) * 0.5 * speed;
+                            }
+                            break;
+                        default: // flow
+                            p.vx += Math.sin(p.y * 0.01 + Date.now() * 0.001) * 0.1;
+                            p.vy += Math.cos(p.x * 0.01 + Date.now() * 0.001) * 0.1;
+                    }
+
+                    // 應用黏度
+                    p.vx *= (1 - viscosity * 0.1);
+                    p.vy *= (1 - viscosity * 0.1);
+
+                    // 更新位置
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    // 邊界反彈
+                    if (p.x < 0 || p.x > canvas.width) p.vx *= -0.8;
+                    if (p.y < 0 || p.y > canvas.height) p.vy *= -0.8;
+
+                    p.x = Math.max(0, Math.min(canvas.width, p.x));
+                    p.y = Math.max(0, Math.min(canvas.height, p.y));
+
+                    // 繪製粒子
+                    ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.6)`;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                matterAnimation = requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+
+        // 頁面卸載時停止鏡頭
+        window.addEventListener('beforeunload', () => {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+            }
+            if (matterAnimation) {
+                cancelAnimationFrame(matterAnimation);
+            }
+        });
+    </script>
+</body>
+</html>

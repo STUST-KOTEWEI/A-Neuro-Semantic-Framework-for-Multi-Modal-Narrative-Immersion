@@ -1,0 +1,56 @@
+[
+  {
+    "id": "e4660b00-9b10-47a7-83d1-c8e185498603",
+    "email": "admin@aireader.com",
+    "username": "admin",
+    "password_hash": "$2b$12$1BzLJVKwzWBw9lbpK9eZ3eCQkLzJ.8nOhuALRE58CRFHjsf/n8xWe",
+    "subscription_tier": "pro",
+    "role": "admin",
+    "created_at": "2025-10-15T01:19:06.816326",
+    "last_login": "2025-10-15T02:30:29.823818",
+    "is_active": true,
+    "profile": {
+      "school_email": null,
+      "api_calls_today": 0,
+      "last_api_call_date": null,
+      "tts_minutes_today": 0,
+      "image_generations_today": 0
+    }
+  },
+  {
+    "id": "32306baf-b89b-47c2-acf6-f4a7ae0200ec",
+    "email": "demo@example.com",
+    "username": "demo",
+    "password_hash": "$2b$12$h7vNNK/562Wy68Z3..Ja/unBlPd0XggVvoEh3K1YHhiQ6wDbFFT/y",
+    "subscription_tier": "plus",
+    "role": "user",
+    "created_at": "2025-10-15T01:19:07.042308",
+    "last_login": null,
+    "is_active": true,
+    "profile": {
+      "school_email": null,
+      "api_calls_today": 0,
+      "last_api_call_date": null,
+      "tts_minutes_today": 0,
+      "image_generations_today": 0
+    }
+  },
+  {
+    "id": "daf71300-73f8-41a4-a1cc-03d6dd573cf0",
+    "email": "ui_test2@example.com",
+    "username": "ui_user2",
+    "password_hash": "$2b$12$WISrWWZ5RLmJHGt4WG9oi.rGp9bU4oTWNMt2/qb042gZinObURiGe",
+    "subscription_tier": "free",
+    "role": "user",
+    "created_at": "2025-10-15T02:01:41.217023",
+    "last_login": "2025-10-15T02:25:35.594370",
+    "is_active": true,
+    "profile": {
+      "school_email": null,
+      "api_calls_today": 1,
+      "last_api_call_date": "2025-10-15",
+      "tts_minutes_today": 0,
+      "image_generations_today": 0
+    }
+  }
+]

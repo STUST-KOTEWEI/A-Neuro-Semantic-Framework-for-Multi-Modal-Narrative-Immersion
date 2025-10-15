@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Modern Reader - 現代閱讀器</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;background:#0a0e27;color:#e2e8f0;line-height:1.5}
+    .container{max-width:420px;margin:0 auto;padding:1rem;min-height:100vh}
+    .header{text-align:center;margin-bottom:2rem;padding-top:2rem}
+    .logo{font-size:1.75rem;font-weight:700;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.5rem}
+    .tagline{font-size:.85rem;color:#94a3b8;margin-bottom:1.5rem}
+    .card{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+    .tabs{display:flex;background:#0f172a;border-radius:12px;padding:.25rem;margin-bottom:1.5rem}
+    .tab{flex:1;text-align:center;padding:.75rem;border-radius:10px;font-weight:600;font-size:.9rem;cursor:pointer;transition:all .2s}
+    .tab.active{background:#2563eb;color:#fff;transform:translateY(-1px)}
+    .form-group{margin-bottom:1rem}
+    label{display:block;font-size:.8rem;font-weight:600;margin-bottom:.5rem;color:#cbd5e1}
+    input,select,textarea{width:100%;border:2px solid #334155;border-radius:10px;background:#0f172a;color:#e2e8f0;padding:.75rem;font-size:.9rem;transition:border-color .2s}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+    .btn{width:100%;border:none;background:linear-gradient(135deg,#2563eb 0%,#3b82f6 100%);color:#fff;padding:.85rem;border-radius:12px;font-weight:600;font-size:.9rem;cursor:pointer;transition:all .2s}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,99,235,.3)}
+    .btn.sec{background:#475569}
+    .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .alert{padding:.75rem;border-radius:10px;margin-bottom:1rem;font-size:.85rem;display:none}
+    .alert.error{background:#7f1d1d;color:#fca5a5;border:1px solid #991b1b}
+    .alert.success{background:#14532d;color:#86efac;border:1px solid #166534}
+    .user-panel{display:none}
+    .user-info{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem}
+    .status-badge{padding:.25rem .6rem;border-radius:20px;font-size:.7rem;font-weight:600}
+    .status-free{background:#475569;color:#e2e8f0}
+    .status-pro{background:#fbbf24;color:#1f2937}
+    .feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:1.5rem 0}
+    .feature-btn{background:#334155;border:none;color:#e2e8f0;padding:.75rem;border-radius:10px;font-size:.8rem;cursor:pointer;transition:all .2s}
+    .feature-btn:hover{background:#475569;transform:translateY(-1px)}
+    .debug-panel{background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:1rem;margin-top:1rem}
+    .debug-log{font-family:ui-monospace,monospace;font-size:.7rem;max-height:150px;overflow-y:auto;white-space:pre-wrap;color:#94a3b8}
+    .footer{text-align:center;margin-top:2rem;padding:1rem;font-size:.7rem;color:#64748b}
+    .hidden{display:none !important}
+  </style>
+</head>
+<body>
+    <div class="wrap">
+        <h1>AI Reader Lite / Auth 測試</h1>
+        <div class="panel" id="authPanel">
+            <div class="tabs">
+                <div class="tab active" id="tabLogin">登入</div>
+                <div class="tab" id="tabRegister">註冊</div>
+            </div>
+            <div id="msgError" class="msg err"></div>
+            <div id="msgOK" class="msg ok"></div>
+            <form id="loginForm">
+                <label>帳號 (Email 或 Username)</label>
+                <input id="loginIdentifier" autocomplete="username" placeholder="user@example.com 或 username" required />
+                <label style="margin-top:.6rem">密碼</label>
+                <input id="loginPassword" type="password" autocomplete="current-password" required />
+                <div style="margin-top:.9rem" class="row">
+                    <button type="submit" id="btnLogin" class="grow">登入</button>
+                    <button type="button" class="sec grow" id="btnQuickFill">測試帳號</button>
+                </div>
+            </form>
+            <form id="registerForm" style="display:none">
+                <div class="row">
+                    <div class="grow">
+                        <label>Email</label>
+                        <input id="regEmail" type="email" autocomplete="email" required />
+                    </div>
+                    <div class="grow">
+                        <label>Username</label>
+                        <input id="regUsername" minlength="3" required />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="grow">
+                        <label>密碼</label>
+                        <input id="regPassword" type="password" minlength="6" autocomplete="new-password" required />
+                    </div>
+                    <div class="grow">
+                        <label>方案</label>
+                        <select id="regTier">
+                            <option value="free">Free</option>
+                            <option value="edu">EDU</option>
+                            <option value="plus">Plus</option>
+                            <option value="pro">Pro</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="eduBox" style="display:none">
+                    <label>學校 Email (.edu)</label>
+                    <input id="regSchoolEmail" type="email" placeholder="your@school.edu" />
+                </div>
+                <button type="submit" style="margin-top:.9rem" id="btnRegister">建立帳號</button>
+            </form>
+        </div>
+
+        <div class="panel" id="userPanel" style="display:none">
+            <div><span class="badge" id="badgeRole">user</span><span class="badge" id="badgeTier">free</span><span id="userEmail" style="font-size:.7rem;color:#94a3b8"></span></div>
+            <div class="divider"></div>
+            <button id="btnMe" class="sec" style="margin-bottom:.6rem">呼叫 /auth/me</button>
+            <pre id="meResult">(尚未呼叫)</pre>
+            <div class="row" style="margin-top:.6rem">
+                <button id="btnLogout" class="sec grow">登出</button>
+                <button id="btnClearLog" type="button" class="grow sec">清除 Log</button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3 style="margin-top:0;font-size:.9rem">Debug Log</h3>
+            <pre id="debugLog"></pre>
+        </div>
+
+        <div class="foot">Lite UI 版 | 若出現 404/網路錯誤請開 DevTools (F12) 觀看 console 與 Network</div>
+    </div>
+    <script>
+    const $ = s=>document.querySelector(s);
+    const log = (...a)=>{const line=a.map(v=>typeof v==='object'?JSON.stringify(v):v).join(' '); const box=$('#debugLog'); box.textContent += '['+new Date().toLocaleTimeString()+'] '+line+'\n'; box.scrollTop=box.scrollHeight;};
+    const show=(el)=>el.style.display='';
+    const hide=(el)=>el.style.display='none';
+    const msgErr=$('#msgError');
+    const msgOK=$('#msgOK');
+    let token=null;
+
+    function flashErr(t){msgErr.textContent=t;msgErr.style.display='block';setTimeout(()=>msgErr.style.display='none',7000)}
+    function flashOK(t){msgOK.textContent=t;msgOK.style.display='block';setTimeout(()=>msgOK.style.display='none',4000)}
+
+    // Tab 切換
+    $('#tabLogin').onclick=()=>{hide($('#registerForm'));show($('#loginForm'));$('#tabLogin').classList.add('active');$('#tabRegister').classList.remove('active')};
+    $('#tabRegister').onclick=()=>{hide($('#loginForm'));show($('#registerForm'));$('#tabRegister').classList.add('active');$('#tabLogin').classList.remove('active')};
+    $('#regTier').onchange=e=>{e.target.value==='edu'?show($('#eduBox')):hide($('#eduBox'))};
+    $('#btnQuickFill').onclick=()=>{ $('#loginIdentifier').value='ui_test2@example.com'; $('#loginPassword').value='test123'; };
+
+    async function api(path, data){
+        const opt={method:data?'POST':'GET',headers:{'Accept':'application/json'}};
+        if(data){opt.headers['Content-Type']='application/json';opt.body=JSON.stringify(data);} 
+        if(token) opt.headers['Authorization']='Bearer '+token;
+        log('FETCH', path, data?JSON.stringify(data):'');
+        let res; try{res=await fetch(path,opt);}catch(e){flashErr('網路無法連線: '+e.message);log('NETWORK ERROR',e.message);throw e;}
+        const txt=await res.text(); let json; try{json=txt?JSON.parse(txt):{};}catch(e){flashErr('回應不是 JSON');log('PARSE ERR',txt.slice(0,200)); throw e;}
+        log('RESP', res.status, JSON.stringify(json).slice(0,300));
+        if(!res.ok){flashErr('錯誤 '+res.status+': '+(json.detail||json.error||'未知')); throw new Error(json.detail||json.error||'HTTP '+res.status);} 
+        return json;
+    }
+
+    // 註冊
+    $('#registerForm').addEventListener('submit', async e=>{
+        e.preventDefault();
+        const tier=$('#regTier').value;
+        const body={email:$('#regEmail').value.trim(),username:$('#regUsername').value.trim(),password:$('#regPassword').value,subscription_tier:tier};
+        if(tier==='edu') body.school_email=$('#regSchoolEmail').value.trim();
+        try{const r=await api('/auth/register', body); flashOK('註冊成功'); token=r.token; fillUser(r.user);}catch(err){log('REGISTER FAIL',err.message);} 
+    });
+
+    // 登入
+    $('#loginForm').addEventListener('submit', async e=>{
+        e.preventDefault();
+        const ident=$('#loginIdentifier').value.trim();
+        const body={password:$('#loginPassword').value};
+        if(ident.includes('@')) body.email=ident; else body.username=ident; // 支援 email 或 username
+        try{const r=await api('/auth/login', body); flashOK('登入成功'); token=r.token; fillUser(r.user);}catch(err){log('LOGIN FAIL',err.message);} 
+    });
+
+    function fillUser(u){hide($('#authPanel'));show($('#userPanel'));$('#badgeTier').textContent=u.subscription_tier;$('#badgeRole').textContent=u.role;$('#userEmail').textContent=u.email;}
+
+    $('#btnMe').onclick=async()=>{try{const r=await api('/auth/me');$('#meResult').textContent=JSON.stringify(r,null,2);}catch(e){log('ME FAIL',e.message);} };
+    $('#btnLogout').onclick=()=>{token=null;show($('#authPanel'));hide($('#userPanel'));$('#meResult').textContent='(尚未呼叫)';flashOK('已登出');};
+    $('#btnClearLog').onclick=()=>{$('#debugLog').textContent='';};
+
+    // 啟動時健康檢查
+    (async()=>{try{const h=await api('/health');flashOK('Health OK');log('HEALTH',JSON.stringify(h));}catch(e){log('HEALTH FAIL',e.message);} })();
+    </script>
+</body>
+</html>
+        .badge-edu { background-color: #17a2b8; color: white; }
+        .badge-plus { background-color: #28a745; color: white; }
+        .badge-pro { background-color: #ffc107; color: #212529; }
+        
+        /* Broadcast Generation */
+        .broadcast-timeline { display: flex; overflow-x: auto; padding: 1rem 0; }
+        .timeline-segment { min-width: 120px; padding: 0.5rem; margin-right: 0.5rem; border: 1px solid #ddd; border-radius: 4px; }
+        .segment-active { background-color: #268bd2; color: white; }
+        
+        /* Usage Progress */
+        .usage-bar { background-color: #e9ecef; height: 8px; border-radius: 4px; overflow: hidden; }
+        .usage-fill { background-color: #268bd2; height: 100%; transition: width 0.3s ease; }
+        .usage-fill.warning { background-color: #ffc107; }
+        .usage-fill.danger { background-color: #dc3545; }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Authentication Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close float-right text-2xl cursor-pointer">&times;</span>
+            <div id="authTabs" class="flex border-b mb-4">
+                <button class="auth-tab px-4 py-2 border-b-2 border-transparent" data-tab="login">登入</button>
+                <button class="auth-tab px-4 py-2 border-b-2 border-transparent" data-tab="register">註冊</button>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form">
+                <h3 class="text-lg font-semibold mb-4">登入您的帳戶</h3>
+                <form id="loginFormElement">
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium mb-1">電子郵件</label>
+                        <input type="email" id="loginEmail" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-1">密碼</label>
+                        <input type="password" id="loginPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
+                    </div>
+                    <button type="submit" class="w-full accent-bg text-white py-2 rounded-md hover:bg-blue-600">登入</button>
+                </form>
+            </div>
+            
+            <!-- Register Form -->
+            <div id="registerForm" class="auth-form" style="display: none;">
+                <h3 class="text-lg font-semibold mb-4">建立新帳戶</h3>
+                <form id="registerFormElement">
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium mb-1">電子郵件</label>
+                        <input type="email" id="registerEmail" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium mb-1">使用者名稱</label>
+                        <input type="text" id="registerUsername" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium mb-1">密碼</label>
+                        <input type="password" id="registerPassword" class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium mb-1">訂閱方案</label>
+                        <select id="registerTier" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            <option value="free">免費版</option>
+                            <option value="edu">教育版</option>
+                            <option value="plus">增強版</option>
+                            <option value="pro">專業版</option>
+                        </select>
+                    </div>
+                    <div id="eduEmailField" class="mb-3" style="display: none;">
+                        <label class="block text-sm font-medium mb-1">學校電子郵件 (.edu)</label>
+                        <input type="email" id="registerSchoolEmail" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    </div>
+                    <button type="submit" class="w-full accent-bg text-white py-2 rounded-md hover:bg-blue-600">註冊</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="accent-bg text-white p-4 sticky top-0 z-50 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold">AI多感官智能閱讀器</h1>
+            
+            <!-- User Info -->
+            <div id="userInfo" class="hidden flex items-center space-x-4">
+                <span id="usageIndicator" class="text-sm"></span>
+                <span id="userBadge" class="px-2 py-1 text-xs rounded-full"></span>
+                <span id="username" class="font-medium"></span>
+                <button id="logoutBtn" class="text-sm hover:text-gray-200">登出</button>
+            </div>
+            
+            <!-- Login Button -->
+            <button id="loginBtn" class="accent-bg border border-white px-4 py-2 rounded hover:bg-blue-600">登入</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Dashboard for Authenticated Users -->
+        <div id="dashboard" class="hidden">
+            <!-- Usage Status -->
+            <div class="bg-white rounded-lg card-shadow p-6 mb-6">
+                <h2 class="text-xl font-semibold mb-4">今日使用量</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold accent-text" id="apiUsage">0</div>
+                        <div class="text-sm text-gray-600">API 呼叫</div>
+                        <div class="usage-bar mt-2">
+                            <div class="usage-fill" id="apiUsageBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold secondary-accent-text" id="ttsUsage">0</div>
+                        <div class="text-sm text-gray-600">TTS 分鐘</div>
+                        <div class="usage-bar mt-2">
+                            <div class="usage-fill" id="ttsUsageBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-purple-600" id="imageUsage">0</div>
+                        <div class="text-sm text-gray-600">圖像生成</div>
+                        <div class="usage-bar mt-2">
+                            <div class="usage-fill" id="imageUsageBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Broadcast Generation -->
+            <div class="bg-white rounded-lg card-shadow p-6 mb-6">
+                <h2 class="text-xl font-semibold mb-4">10分鐘廣播節目生成</h2>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">主題或文本</label>
+                    <textarea id="broadcastInput" class="w-full px-3 py-2 border border-gray-300 rounded-md" rows="4" 
+                              placeholder="輸入要生成廣播節目的主題或文本內容..."></textarea>
+                </div>
+                <div class="flex space-x-4 mb-4">
+                    <button id="generateBroadcast" class="accent-bg text-white px-6 py-2 rounded hover:bg-blue-600">
+                        生成廣播節目
+                    </button>
+                    <button id="playBroadcast" class="secondary-accent-bg text-white px-6 py-2 rounded hover:bg-green-600" disabled>
+                        播放節目
+                    </button>
+                </div>
+                
+                <!-- Broadcast Timeline -->
+                <div id="broadcastTimeline" class="hidden">
+                    <h3 class="font-semibold mb-2">節目時間軸</h3>
+                    <div class="broadcast-timeline" id="timelineContainer"></div>
+                </div>
+                
+                <!-- Audio Player -->
+                <div id="broadcastPlayer" class="hidden mt-4">
+                    <audio id="audioPlayer" controls class="w-full">
+                        您的瀏覽器不支持音頻播放器。
+                    </audio>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Reader Interface -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Text Input -->
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">文本輸入</h2>
+                <textarea id="textInput" class="w-full px-3 py-2 border border-gray-300 rounded-md" rows="8" 
+                          placeholder="在這裡輸入您要分析的文本..."></textarea>
+                
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <button id="analyzeText" class="accent-bg text-white px-4 py-2 rounded hover:bg-blue-600">
+                        分析文本
+                    </button>
+                    <button id="generateTTS" class="secondary-accent-bg text-white px-4 py-2 rounded hover:bg-green-600">
+                        語音合成
+                    </button>
+                    <button id="generateHaptics" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                        觸覺反饋
+                    </button>
+                    <button id="selectImages" class="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700">
+                        情感配圖
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Display -->
+            <div class="bg-white rounded-lg card-shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">結果展示</h2>
+                
+                <!-- Loading Indicator -->
+                <div id="loadingIndicator" class="hidden text-center py-8">
+                    <div class="loader mx-auto"></div>
+                    <p class="mt-2 text-gray-600">處理中...</p>
+                </div>
+                
+                <!-- Results Container -->
+                <div id="resultsContainer" class="space-y-4">
+                    <div id="analysisResult" class="hidden">
+                        <h3 class="font-semibold text-gray-700">文本分析結果</h3>
+                        <div id="analysisContent" class="bg-gray-50 p-3 rounded mt-2"></div>
+                    </div>
+                    
+                    <div id="ttsResult" class="hidden">
+                        <h3 class="font-semibold text-gray-700">語音合成</h3>
+                        <audio id="ttsAudio" controls class="w-full mt-2">
+                            您的瀏覽器不支持音頻播放器。
+                        </audio>
+                    </div>
+                    
+                    <div id="hapticsResult" class="hidden">
+                        <h3 class="font-semibold text-gray-700">觸覺反饋模式</h3>
+                        <div id="hapticsContent" class="bg-gray-50 p-3 rounded mt-2"></div>
+                    </div>
+                    
+                    <div id="imagesResult" class="hidden">
+                        <h3 class="font-semibold text-gray-700">情感配圖</h3>
+                        <div id="imagesGallery" class="grid grid-cols-2 gap-2 mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Overview -->
+        <div class="mt-12 bg-white rounded-lg card-shadow p-6">
+            <h2 class="text-xl font-semibold mb-6">平台功能特色</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="text-center">
+                    <div class="text-3xl mb-2">🧠</div>
+                    <h3 class="font-semibold">AI文本分析</h3>
+                    <p class="text-sm text-gray-600">深度語意理解與情感分析</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl mb-2">🔊</div>
+                    <h3 class="font-semibold">語音合成</h3>
+                    <p class="text-sm text-gray-600">高品質多語言TTS</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl mb-2">🎨</div>
+                    <h3 class="font-semibold">情感配圖</h3>
+                    <p class="text-sm text-gray-600">AI驅動的情境圖像選擇</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl mb-2">📻</div>
+                    <h3 class="font-semibold">廣播生成</h3>
+                    <p class="text-sm text-gray-600">自動化10分鐘節目製作</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="accent-bg text-white p-8 mt-12">
+        <div class="container mx-auto text-center">
+            <h3 class="text-lg font-semibold mb-2">AI多感官智能閱讀器</h3>
+            <p class="text-sm opacity-80">運用人工智慧技術，提供沉浸式多感官閱讀體驗</p>
+            <div class="mt-4 text-xs opacity-60">
+                © 2024 AI Reader Project. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    </script>
+    </body>
+    </html>
+        let authToken = localStorage.getItem('authToken');
+        let currentUser = null;
+
+        // DOM Elements
+        const authModal = document.getElementById('authModal');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userInfo = document.getElementById('userInfo');
+        const dashboard = document.getElementById('dashboard');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            if (authToken) {
+                checkAuthStatus();
+            }
+        });
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Authentication Modal
+            const modal = document.getElementById('authModal');
+            const span = document.getElementsByClassName('close')[0];
+            
+            loginBtn.onclick = () => authModal.style.display = 'block';
+            span.onclick = () => authModal.style.display = 'none';
+            window.onclick = (event) => {
+                if (event.target == authModal) {
+                    authModal.style.display = 'none';
+                }
+            };
+
+            // Auth Tabs
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                tab.addEventListener('click', () => switchAuthTab(tab.dataset.tab));
+            });
+
+            // Auth Forms
+            document.getElementById('loginFormElement').addEventListener('submit', handleLogin);
+            document.getElementById('registerFormElement').addEventListener('submit', handleRegister);
+            
+            // Logout
+            logoutBtn.addEventListener('click', handleLogout);
+
+            // Subscription tier change
+            document.getElementById('registerTier').addEventListener('change', function() {
+                const eduField = document.getElementById('eduEmailField');
+                eduField.style.display = this.value === 'edu' ? 'block' : 'none';
+            });
+
+            // AI Reader Functions
+            document.getElementById('analyzeText').addEventListener('click', analyzeText);
+            document.getElementById('generateTTS').addEventListener('click', generateTTS);
+            document.getElementById('generateHaptics').addEventListener('click', generateHaptics);
+            document.getElementById('selectImages').addEventListener('click', selectImages);
+            
+            // Broadcast Functions
+            document.getElementById('generateBroadcast').addEventListener('click', generateBroadcast);
+            document.getElementById('playBroadcast').addEventListener('click', playBroadcast);
+        }
+
+        // Authentication Functions
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => {
+                t.classList.remove('border-blue-500', 'text-blue-500');
+                t.classList.add('border-transparent');
+            });
+            document.querySelectorAll('.auth-form').forEach(form => form.style.display = 'none');
+            
+            event.target.classList.add('border-blue-500', 'text-blue-500');
+            document.getElementById(tab + 'Form').style.display = 'block';
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    authToken = data.token;
+                    currentUser = data.user;
+                    localStorage.setItem('authToken', authToken);
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    
+                    showUserInterface();
+                    authModal.style.display = 'none';
+                    showSuccessMessage('登入成功！');
+                } else {
+                    showErrorMessage(data.detail || '登入失敗');
+                }
+            } catch (error) {
+                showErrorMessage('網路錯誤，請稍後再試');
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            const email = document.getElementById('registerEmail').value;
+            const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
+            const subscription_tier = document.getElementById('registerTier').value;
+            const school_email = document.getElementById('registerSchoolEmail').value;
+
+            const registrationData = { email, username, password, subscription_tier };
+            if (subscription_tier === 'edu' && school_email) {
+                registrationData.school_email = school_email;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(registrationData)
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    authToken = data.token;
+                    currentUser = data.user;
+                    localStorage.setItem('authToken', authToken);
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    
+                    showUserInterface();
+                    authModal.style.display = 'none';
+                    showSuccessMessage('註冊成功！');
+                } else {
+                    showErrorMessage(data.detail || '註冊失敗');
+                }
+            } catch (error) {
+                showErrorMessage('網路錯誤，請稍後再試');
+            }
+        }
+
+        function handleLogout() {
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentUser');
+            showGuestInterface();
+            showSuccessMessage('已成功登出');
+        }
+
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/check`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUser = data.user;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showUserInterface();
+                    loadUserUsage();
+                } else {
+                    handleLogout();
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                handleLogout();
+            }
+        }
+
+        // UI Update Functions
+        function showUserInterface() {
+            loginBtn.style.display = 'none';
+            userInfo.classList.remove('hidden');
+            dashboard.classList.remove('hidden');
+            
+            if (currentUser) {
+                document.getElementById('username').textContent = currentUser.username;
+                updateSubscriptionBadge(currentUser.subscription_tier);
+            }
+        }
+
+        function showGuestInterface() {
+            loginBtn.style.display = 'block';
+            userInfo.classList.add('hidden');
+            dashboard.classList.add('hidden');
+        }
+
+        function updateSubscriptionBadge(tier) {
+            const badge = document.getElementById('userBadge');
+            badge.className = `px-2 py-1 text-xs rounded-full badge-${tier}`;
+            badge.textContent = tier.toUpperCase();
+        }
+
+        async function loadUserUsage() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    updateUsageDisplay(data.subscription);
+                }
+            } catch (error) {
+                console.error('Failed to load usage:', error);
+            }
+        }
+
+        function updateUsageDisplay(subscription) {
+            const { current_usage, limits } = subscription;
+            
+            // API Calls
+            const apiUsage = current_usage.api_calls_today;
+            const apiLimit = limits.api_calls_per_day;
+            document.getElementById('apiUsage').textContent = apiLimit === -1 ? `${apiUsage} (無限制)` : `${apiUsage}/${apiLimit}`;
+            updateUsageBar('apiUsageBar', apiUsage, apiLimit);
+            
+            // TTS Minutes
+            const ttsUsage = current_usage.tts_minutes_today;
+            const ttsLimit = limits.tts_minutes_per_day;
+            document.getElementById('ttsUsage').textContent = ttsLimit === -1 ? `${ttsUsage} (無限制)` : `${ttsUsage}/${ttsLimit}`;
+            updateUsageBar('ttsUsageBar', ttsUsage, ttsLimit);
+            
+            // Image Generations
+            const imageUsage = current_usage.image_generations_today;
+            const imageLimit = limits.image_generations_per_day;
+            document.getElementById('imageUsage').textContent = imageLimit === -1 ? `${imageUsage} (無限制)` : `${imageUsage}/${imageLimit}`;
+            updateUsageBar('imageUsageBar', imageUsage, imageLimit);
+        }
+
+        function updateUsageBar(barId, usage, limit) {
+            const bar = document.getElementById(barId);
+            if (limit === -1) {
+                bar.style.width = '100%';
+                bar.classList.remove('warning', 'danger');
+            } else {
+                const percentage = (usage / limit) * 100;
+                bar.style.width = `${percentage}%`;
+                
+                bar.classList.remove('warning', 'danger');
+                if (percentage >= 90) {
+                    bar.classList.add('danger');
+                } else if (percentage >= 70) {
+                    bar.classList.add('warning');
+                }
+            }
+        }
+
+        // AI Reader Functions
+        async function analyzeText() {
+            const text = document.getElementById('textInput').value;
+            if (!text.trim()) {
+                showErrorMessage('請輸入要分析的文本');
+                return;
+            }
+
+            showLoading();
+            try {
+                const endpoint = authToken ? '/generate_text_protected' : '/generate_text';
+                const headers = { 'Content-Type': 'application/json' };
+                if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({ text, use_ollama: false })
+                });
+
+                const data = await response.json();
+                hideLoading();
+
+                if (response.ok) {
+                    showAnalysisResult(data.result || data);
+                    if (data.usage) updateUsageFromResponse(data.usage);
+                } else {
+                    showErrorMessage(data.detail || '分析失敗');
+                }
+            } catch (error) {
+                hideLoading();
+                showErrorMessage('網路錯誤，請稍後再試');
+            }
+        }
+
+        async function generateTTS() {
+            const text = document.getElementById('textInput').value;
+            if (!text.trim()) {
+                showErrorMessage('請輸入要合成語音的文本');
+                return;
+            }
+
+            showLoading();
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+
+                const response = await fetch(`${API_BASE_URL}/generate_tts`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({ text })
+                });
+
+                const data = await response.json();
+                hideLoading();
+
+                if (response.ok) {
+                    showTTSResult(data);
+                } else {
+                    showErrorMessage(data.detail || 'TTS生成失敗');
+                }
+            } catch (error) {
+                hideLoading();
+                showErrorMessage('網路錯誤，請稍後再試');
+            }
+        }
+
+        async function generateHaptics() {
+            const text = document.getElementById('textInput').value;
+            if (!text.trim()) {
+                showErrorMessage('請輸入要生成觸覺反饋的文本');
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await fetch(`${API_BASE_URL}/generate_haptics`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+
+                const data = await response.json();
+                hideLoading();
+
+                if (response.ok) {
+                    showHapticsResult(data);
+                } else {
+                    showErrorMessage(data.error || '觸覺反饋生成失敗');
+                }
+            } catch (error) {
+                hideLoading();
+                showErrorMessage('網路錯誤，請稍後再試');
+            }
+        }
+
+        async function selectImages() {
+            const text = document.getElementById('textInput').value;
+            if (!text.trim()) {
+                showErrorMessage('請輸入要配圖的文本');
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await fetch(`${API_BASE_URL}/select_images`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+
+                const data = await response.json();
+                hideLoading();
+
+                if (response.ok) {
+                    showImagesResult(data.selected_images);
+                } else {
+                    showErrorMessage(data.error || '圖像選擇失敗');
+                }
+            } catch (error) {
+                hideLoading();
+                showErrorMessage('網路錯誤，請稍後再試');
+            }
+        }
+
+        // Broadcast Generation
+        async function generateBroadcast() {
+            const input = document.getElementById('broadcastInput').value;
+            if (!input.trim()) {
+                showErrorMessage('請輸入廣播節目的主題或內容');
+                return;
+            }
+
+            if (!authToken) {
+                showErrorMessage('請先登入以使用廣播生成功能');
+                return;
+            }
+
+            showLoading();
+            try {
+                // Generate broadcast content using AI
+                const response = await fetch(`${API_BASE_URL}/generate_text_protected`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        text: `創建一個10分鐘的廣播節目腳本，主題：${input}。請包含開場白、主要內容段落和結尾，並注明每段的時間分配。`,
+                        max_tokens: 1500
+                    })
+                });
+
+                const data = await response.json();
+                hideLoading();
+
+                if (response.ok) {
+                    const scriptContent = data.result.generated_text || data.result;
+                    createBroadcastTimeline(scriptContent);
+                    generateBroadcastAudio(scriptContent);
+                    document.getElementById('generateBroadcast').disabled = true;
+                    document.getElementById('playBroadcast').disabled = false;
+                } else {
+                    showErrorMessage(data.detail || '廣播生成失敗');
+                }
+            } catch (error) {
+                hideLoading();
+                showErrorMessage('網路錯誤，請稍後再試');
+            }
+        }
+
+        function createBroadcastTimeline(script) {
+            const timeline = document.getElementById('broadcastTimeline');
+            const container = document.getElementById('timelineContainer');
+            
+            // Simple timeline creation - split script into segments
+            const segments = script.split('\n').filter(line => line.trim()).slice(0, 10);
+            container.innerHTML = '';
+            
+            segments.forEach((segment, index) => {
+                const segmentDiv = document.createElement('div');
+                segmentDiv.className = 'timeline-segment';
+                segmentDiv.innerHTML = `
+                    <div class="font-semibold text-sm">${(index * 1).toFixed(1)}-${((index + 1) * 1).toFixed(1)}分</div>
+                    <div class="text-xs mt-1">${segment.substring(0, 50)}...</div>
+                `;
+                container.appendChild(segmentDiv);
+            });
+            
+            timeline.classList.remove('hidden');
+        }
+
+        async function generateBroadcastAudio(script) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/generate_tts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: script })
+                });
+
+                const data = await response.json();
+                if (response.ok && data.audio_url) {
+                    const audioPlayer = document.getElementById('audioPlayer');
+                    audioPlayer.src = data.audio_url;
+                    document.getElementById('broadcastPlayer').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Audio generation failed:', error);
+            }
+        }
+
+        function playBroadcast() {
+            const audioPlayer = document.getElementById('audioPlayer');
+            audioPlayer.play();
+        }
+
+        // Result Display Functions
+        function showLoading() {
+            document.getElementById('loadingIndicator').classList.remove('hidden');
+            document.querySelectorAll('#resultsContainer > div').forEach(div => div.classList.add('hidden'));
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingIndicator').classList.add('hidden');
+        }
+
+        function showAnalysisResult(result) {
+            const container = document.getElementById('analysisResult');
+            const content = document.getElementById('analysisContent');
+            
+            if (typeof result === 'string') {
+                content.textContent = result;
+            } else {
+                content.innerHTML = `
+                    <div><strong>生成文本:</strong> ${result.generated_text || '無'}</div>
+                    <div><strong>情感分析:</strong> ${result.emotion || '無'}</div>
+                    <div><strong>處理時間:</strong> ${result.processing_time || '無'}秒</div>
+                `;
+            }
+            
+            container.classList.remove('hidden');
+        }
+
+        function showTTSResult(result) {
+            const container = document.getElementById('ttsResult');
+            const audio = document.getElementById('ttsAudio');
+            
+            if (result.audio_url) {
+                audio.src = result.audio_url;
+                container.classList.remove('hidden');
+            } else {
+                showErrorMessage('無法生成音頻文件');
+            }
+        }
+
+        function showHapticsResult(result) {
+            const container = document.getElementById('hapticsResult');
+            const content = document.getElementById('hapticsContent');
+            
+            content.innerHTML = `
+                <div><strong>模式:</strong> ${result.pattern_type || '無'}</div>
+                <div><strong>強度:</strong> ${result.intensity || '無'}</div>
+                <div><strong>持續時間:</strong> ${result.duration || '無'}ms</div>
+                <div><strong>描述:</strong> ${result.description || '無'}</div>
+            `;
+            
+            container.classList.remove('hidden');
+        }
+
+        function showImagesResult(images) {
+            const container = document.getElementById('imagesResult');
+            const gallery = document.getElementById('imagesGallery');
+            
+            gallery.innerHTML = '';
+            images.forEach(image => {
+                const imgDiv = document.createElement('div');
+                imgDiv.className = 'text-center';
+                imgDiv.innerHTML = `
+                    <img src="${image.url}" alt="${image.description}" class="w-full h-24 object-cover rounded">
+                    <div class="text-xs mt-1">${image.emotion}</div>
+                `;
+                gallery.appendChild(imgDiv);
+            });
+            
+            container.classList.remove('hidden');
+        }
+
+        // Utility Functions
+        function updateUsageFromResponse(usage) {
+            if (usage.usage !== undefined) {
+                loadUserUsage(); // Reload complete usage data
+            }
+        }
+
+        function showSuccessMessage(message) {
+            // Simple success message - you can enhance this with a toast library
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'fixed top-4 right-4 bg-green-500 text-white p-4 rounded shadow-lg z-50';
+            alertDiv.textContent = message;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                document.body.removeChild(alertDiv);
+            }, 3000);
+        }
+
+        function showErrorMessage(message) {
+            // Simple error message - you can enhance this with a toast library
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'fixed top-4 right-4 bg-red-500 text-white p-4 rounded shadow-lg z-50';
+            alertDiv.textContent = message;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                document.body.removeChild(alertDiv);
+            }, 3000);
+        }
+    </script>
+</body>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>AI 多感官閱讀器 - 登入 / 註冊</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body{font-family:'Noto Sans TC',sans-serif;background:#0f172a;color:#f1f5f9}
+        .card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:1.5rem;box-shadow:0 4px 16px -2px rgba(0,0,0,.6)}
+        input,select{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:.6rem .8rem;width:100%;color:#f1f5f9}
+        input:focus,select:focus{outline:2px solid #2563eb;border-color:#2563eb}
+        button{background:#2563eb;border:none;border-radius:8px;padding:.7rem 1.2rem;font-weight:600;color:#fff}
+        button:hover{background:#1d4ed8}
+        .tab-btn{padding:.5rem 1rem;border-radius:6px;font-weight:600;cursor:pointer}
+        .tab-btn.active{background:#2563eb}
+        .error{background:#b91c1c;color:#fff;padding:.5rem .75rem;border-radius:6px;font-size:.875rem;display:none;white-space:pre-line}
+        .success{background:#15803d;color:#fff;padding:.5rem .75rem;border-radius:6px;font-size:.875rem;display:none}
+        .hidden{display:none}
+        .badge{background:#334155;border-radius:999px;padding:.25rem .6rem;font-size:.75rem}
+        .mono{font-family:ui-monospace,monospace}
+        .link{color:#38bdf8;cursor:pointer}
+        .link:hover{text-decoration:underline}
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center px-4 py-10">

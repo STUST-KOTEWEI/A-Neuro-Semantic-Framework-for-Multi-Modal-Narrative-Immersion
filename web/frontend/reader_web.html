@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Reader - 網頁版</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    
+    header p {
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+    
+    nav {
+      background: #f8f9fa;
+      padding: 15px 30px;
+      display: flex;
+      gap: 10px;
+      border-bottom: 2px solid #e9ecef;
+    }
+    
+    nav button {
+      padding: 10px 20px;
+      border: none;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    nav button:hover {
+      background: #667eea;
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    nav button.active {
+      background: #667eea;
+      color: white;
+    }
+    
+    main {
+      padding: 30px;
+    }
+    
+    .content-area {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+    
+    .display-section {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 25px;
+      min-height: 400px;
+    }
+    
+    .display-section h2 {
+      color: #667eea;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+    }
+    
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .image-card {
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
+    
+    .image-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    }
+    
+    .image-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    
+    .image-card .info {
+      padding: 10px;
+      font-size: 0.9rem;
+    }
+    
+    .control-panel {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 25px;
+    }
+    
+    .control-panel h3 {
+      color: #667eea;
+      margin-bottom: 15px;
+    }
+    
+    .feature-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .feature-btn {
+      padding: 15px;
+      border: none;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .feature-btn:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .permission-section {
+      margin-top: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      border: 2px dashed #667eea;
+    }
+    
+    .permission-btn {
+      padding: 10px 15px;
+      border: 2px solid #667eea;
+      background: white;
+      color: #667eea;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      margin: 5px;
+      transition: all 0.3s;
+    }
+    
+    .permission-btn:hover {
+      background: #667eea;
+      color: white;
+    }
+    
+    .permission-btn.granted {
+      background: #10b981;
+      color: white;
+      border-color: #10b981;
+    }
+    
+    .debug-log {
+      background: #1e293b;
+      color: #94a3b8;
+      padding: 20px;
+      border-radius: 10px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      margin-top: 20px;
+    }
+    
+    .alert {
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-weight: 600;
+      display: none;
+    }
+    
+    .alert.success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 2px solid #10b981;
+    }
+    
+    .alert.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 2px solid #ef4444;
+    }
+    
+    .video-preview {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 10px;
+      margin-top: 15px;
+      display: none;
+    }
+    
+    #canvas {
+      display: none;
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .data-table th {
+      background: #667eea;
+      color: white;
+      padding: 12px;
+      text-align: left;
+    }
+    
+    .data-table td {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .data-table tr:hover {
+      background: #f3f4f6;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🚀 Modern Reader</h1>
+      <p>現代閱讀 • 智能分析 • 多感官體驗</p>
+    </header>
+    
+    <nav>
+      <button id="navHome" class="active">🏠 首頁</button>
+      <button id="navFeatures">⚡ 功能</button>
+      <button id="navSettings">⚙️ 設定</button>
+    </nav>
+    
+    <main>
+      <div id="alertBox" class="alert"></div>
+      
+      <!-- 首頁 -->
+      <div id="pageHome">
+        <h2 style="color: #667eea; font-size: 2rem; margin-bottom: 20px;">歡迎使用 Modern Reader</h2>
+        <p style="font-size: 1.1rem; line-height: 1.8; color: #4b5563;">
+          本平台提供多感官 AI 閱讀體驗，支援 NLP 分析、RAG 搜圖、語音錄音/播放、ISBN 封面查詢與數據記錄。
+          可直接使用各項功能，或請求相機、麥克風權限以解鎖更多互動體驗。
+        </p>
+        
+        <div class="permission-section">
+          <h3 style="color: #667eea; margin-bottom: 15px;">📱 裝置權限</h3>
+          <p style="margin-bottom: 15px; color: #6b7280;">請求使用裝置功能以提升體驗：</p>
+          <button id="btnRequestCamera" class="permission-btn">📷 請求相機權限</button>
+          <button id="btnRequestMicrophone" class="permission-btn">🎤 請求麥克風權限</button>
+          <video id="videoPreview" class="video-preview" autoplay></video>
+          <canvas id="canvas"></canvas>
+        </div>
+      </div>
+      
+      <!-- 功能頁面 -->
+      <div id="pageFeatures" style="display: none;">
+        <div class="content-area">
+          <div class="display-section">
+            <h2 id="displayTitle">📊 顯示區域</h2>
+            <div id="displayContent">
+              <p style="color: #6b7280;">點擊右側功能按鈕查看內容...</p>
+            </div>
+          </div>
+          
+          <div class="control-panel">
+            <h3>⚡ 功能選單</h3>
+            <div class="feature-buttons">
+              <button class="feature-btn" id="btnNLP">📝 NLP分析</button>
+              <button class="feature-btn" id="btnRAG">🔍 RAG搜圖</button>
+              <button class="feature-btn" id="btnSTT">🎙️ STT情感偵測</button>
+              <button class="feature-btn" id="btnTTS">🔊 TTS播客內容</button>
+              <button class="feature-btn" id="btnISBN">📚 ISBN書籍封面</button>
+              <button class="feature-btn" id="btnData">📊 用戶數據</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="debug-log" id="debugLog">載入中...</div>
+      </div>
+      
+      <!-- 設定頁面 -->
+      <div id="pageSettings" style="display: none;">
+        <h2 style="color: #667eea; font-size: 2rem; margin-bottom: 20px;">⚙️ 設定</h2>
+        <p style="color: #6b7280;">功能開發中...</p>
+      </div>
+    </main>
+  </div>
+  
+  <script>
+    const $ = s => document.querySelector(s);
+    const log = (...args) => {
+      const msg = args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : a).join(' ');
+      $('#debugLog').textContent += `[${new Date().toLocaleTimeString()}] ${msg}\n`;
+      $('#debugLog').scrollTop = $('#debugLog').scrollHeight;
+    };
+    
+    const showAlert = (msg, type = 'error') => {
+      const alert = $('#alertBox');
+      alert.textContent = msg;
+      alert.className = `alert ${type}`;
+      alert.style.display = 'block';
+      setTimeout(() => alert.style.display = 'none', 5000);
+    };
+    
+    const API_BASE = window.location.port === '8010' ? '' : 'http://localhost:8010';
+    let cameraStream = null;
+    let audioStream = null;
+    
+    // 導航功能
+    $('#navHome').addEventListener('click', () => {
+      $('#pageHome').style.display = 'block';
+      $('#pageFeatures').style.display = 'none';
+      $('#pageSettings').style.display = 'none';
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      $('#navHome').classList.add('active');
+    });
+    
+    $('#navFeatures').addEventListener('click', () => {
+      $('#pageHome').style.display = 'none';
+      $('#pageFeatures').style.display = 'block';
+      $('#pageSettings').style.display = 'none';
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      $('#navFeatures').classList.add('active');
+      log('進入功能頁面');
+    });
+    
+    $('#navSettings').addEventListener('click', () => {
+      $('#pageHome').style.display = 'none';
+      $('#pageFeatures').style.display = 'none';
+      $('#pageSettings').style.display = 'block';
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      $('#navSettings').classList.add('active');
+    });
+    
+    // 相機權限請求
+    $('#btnRequestCamera').addEventListener('click', async () => {
+      try {
+        log('請求相機權限...');
+        cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        $('#videoPreview').srcObject = cameraStream;
+        $('#videoPreview').style.display = 'block';
+        $('#btnRequestCamera').classList.add('granted');
+        $('#btnRequestCamera').textContent = '✅ 相機已授權';
+        log('✅ 相機權限已授予');
+        showAlert('相機權限已授予', 'success');
+      } catch (e) {
+        log('❌ 相機權限被拒絕:', e.message);
+        showAlert('相機權限被拒絕', 'error');
+      }
+    });
+    
+    // 麥克風權限請求
+    $('#btnRequestMicrophone').addEventListener('click', async () => {
+      try {
+        log('請求麥克風權限...');
+        audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        $('#btnRequestMicrophone').classList.add('granted');
+        $('#btnRequestMicrophone').textContent = '✅ 麥克風已授權';
+        log('✅ 麥克風權限已授予');
+        showAlert('麥克風權限已授予', 'success');
+      } catch (e) {
+        log('❌ 麥克風權限被拒絕:', e.message);
+        showAlert('麥克風權限被拒絕', 'error');
+      }
+    });
+    
+    // NLP 分析
+    $('#btnNLP').addEventListener('click', async () => {
+      log('載入 NLP 分析結果...');
+      try {
+        const resp = await fetch(`${API_BASE}/data/nlp`);
+        const data = await resp.json();
+        
+        let html = '<h3 style="color: #667eea;">📝 NLP 分析結果</h3>';
+        html += '<table class="data-table"><tr><th>文本</th><th>類型</th><th>結果</th></tr>';
+        data.data.forEach(item => {
+          html += `<tr>
+            <td>${item.text}</td>
+            <td>${item.analysis_type}</td>
+            <td><pre style="margin:0;">${JSON.stringify(item.result, null, 2)}</pre></td>
+          </tr>`;
+        });
+        html += '</table>';
+        
+        $('#displayTitle').textContent = '📝 NLP 分析結果';
+        $('#displayContent').innerHTML = html;
+        log(`✅ 載入 ${data.data.length} 筆 NLP 分析`);
+        showAlert(`載入 ${data.data.length} 筆分析結果`, 'success');
+      } catch (e) {
+        log('❌ 載入失敗:', e.message);
+        showAlert('載入 NLP 數據失敗', 'error');
+      }
+    });
+    
+    // RAG 搜圖
+    $('#btnRAG').addEventListener('click', async () => {
+      log('載入 RAG 圖像...');
+      try {
+        const resp = await fetch(`${API_BASE}/data/rag-images`);
+        const data = await resp.json();
+        
+        let html = '<h3 style="color: #667eea;">🔍 RAG 搜圖結果</h3>';
+        html += '<div class="image-grid">';
+        data.data.forEach(item => {
+          html += `
+            <div class="image-card">
+              <img src="${item.image_url}" alt="${item.description}" onerror="this.src='https://via.placeholder.com/200x200?text=圖片載入失敗'">
+              <div class="info">
+                <strong>${item.query}</strong><br>
+                <small>${item.description}</small><br>
+                <small>相關度: ${(item.relevance_score * 100).toFixed(0)}%</small>
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+        
+        $('#displayTitle').textContent = '🔍 RAG 搜圖結果';
+        $('#displayContent').innerHTML = html;
+        log(`✅ 載入 ${data.data.length} 張圖像`);
+        showAlert(`載入 ${data.data.length} 張圖像`, 'success');
+      } catch (e) {
+        log('❌ 載入失敗:', e.message);
+        showAlert('載入圖像失敗', 'error');
+      }
+    });
+    
+    // STT 情感偵測
+    $('#btnSTT').addEventListener('click', async () => {
+      log('載入情感偵測結果...');
+      try {
+        const resp = await fetch(`${API_BASE}/data/emotions`);
+        const data = await resp.json();
+        
+        let html = '<h3 style="color: #667eea;">🎙️ 情感偵測結果</h3>';
+        html += '<table class="data-table"><tr><th>文本</th><th>情感</th><th>信心度</th></tr>';
+        data.data.forEach(item => {
+          html += `<tr>
+            <td>${item.audio_text}</td>
+            <td><strong>${item.emotion}</strong></td>
+            <td>${(item.confidence * 100).toFixed(1)}%</td>
+          </tr>`;
+        });
+        html += '</table>';
+        
+        $('#displayTitle').textContent = '🎙️ 情感偵測結果';
+        $('#displayContent').innerHTML = html;
+        log(`✅ 載入 ${data.data.length} 筆情感數據`);
+        showAlert(`載入 ${data.data.length} 筆情感數據`, 'success');
+      } catch (e) {
+        log('❌ 載入失敗:', e.message);
+        showAlert('載入情感數據失敗', 'error');
+      }
+    });
+    
+    // TTS 播客內容
+    $('#btnTTS').addEventListener('click', async () => {
+      log('載入播客內容...');
+      try {
+        const resp = await fetch(`${API_BASE}/data/podcasts`);
+        const data = await resp.json();
+        
+        let html = '<h3 style="color: #667eea;">🔊 播客內容列表</h3>';
+        html += '<table class="data-table"><tr><th>標題</th><th>內容</th><th>時長</th></tr>';
+        data.data.forEach(item => {
+          const minutes = Math.floor(item.duration / 60);
+          const seconds = item.duration % 60;
+          html += `<tr>
+            <td><strong>${item.title}</strong></td>
+            <td>${item.content}</td>
+            <td>${minutes}:${seconds.toString().padStart(2, '0')}</td>
+          </tr>`;
+        });
+        html += '</table>';
+        
+        $('#displayTitle').textContent = '🔊 播客內容列表';
+        $('#displayContent').innerHTML = html;
+        log(`✅ 載入 ${data.data.length} 個播客`);
+        showAlert(`載入 ${data.data.length} 個播客`, 'success');
+      } catch (e) {
+        log('❌ 載入失敗:', e.message);
+        showAlert('載入播客內容失敗', 'error');
+      }
+    });
+    
+    // ISBN 書籍封面
+    $('#btnISBN').addEventListener('click', async () => {
+      log('載入書籍封面...');
+      try {
+        const resp = await fetch(`${API_BASE}/data/book-covers`);
+        const data = await resp.json();
+        
+        let html = '<h3 style="color: #667eea;">📚 書籍封面列表</h3>';
+        html += '<div class="image-grid">';
+        data.data.forEach(item => {
+          html += `
+            <div class="image-card">
+              <img src="${item.cover_image_url}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/200x300?text=封面載入失敗'">
+              <div class="info">
+                <strong>${item.title}</strong><br>
+                <small>${item.author}</small><br>
+                <small>ISBN: ${item.isbn}</small>
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+        
+        $('#displayTitle').textContent = '📚 書籍封面列表';
+        $('#displayContent').innerHTML = html;
+        log(`✅ 載入 ${data.data.length} 本書籍`);
+        showAlert(`載入 ${data.data.length} 本書籍封面`, 'success');
+      } catch (e) {
+        log('❌ 載入失敗:', e.message);
+        showAlert('載入書籍封面失敗', 'error');
+      }
+    });
+    
+    // 用戶數據
+    $('#btnData').addEventListener('click', async () => {
+      log('載入用戶數據...');
+      try {
+        const resp = await fetch(`${API_BASE}/data/users`);
+        const data = await resp.json();
+        
+        let html = '<h3 style="color: #667eea;">📊 用戶數據列表</h3>';
+        html += '<table class="data-table"><tr><th>ID</th><th>用戶名</th><th>Email</th><th>訂閱方案</th></tr>';
+        data.data.forEach(item => {
+          html += `<tr>
+            <td>${item.id}</td>
+            <td><strong>${item.username}</strong></td>
+            <td>${item.email}</td>
+            <td><span style="background: #667eea; color: white; padding: 4px 8px; border-radius: 4px;">${item.subscription_tier}</span></td>
+          </tr>`;
+        });
+        html += '</table>';
+        
+        $('#displayTitle').textContent = '📊 用戶數據列表';
+        $('#displayContent').innerHTML = html;
+        log(`✅ 載入 ${data.data.length} 筆用戶數據`);
+        showAlert(`載入 ${data.data.length} 筆用戶數據`, 'success');
+      } catch (e) {
+        log('❌ 載入失敗:', e.message);
+        showAlert('載入用戶數據失敗', 'error');
+      }
+    });
+    
+    log('Modern Reader 網頁版已載入');
+    log(`API 基礎路徑: ${API_BASE || '(相對路徑)'}`);
+  </script>
+</body>
+</html>

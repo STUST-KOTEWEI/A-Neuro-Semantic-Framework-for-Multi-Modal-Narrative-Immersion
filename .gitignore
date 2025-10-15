@@ -36,3 +36,13 @@ Thumbs.db
 
 # Media files
 *.mp3
+
+# Markdown linting
+.markdownlint-cli2.jsonc
+.markdownlintignore
+
+# 排除第三方依賴的格式檢查
+frontends/**/ios/Pods/
+frontends/**/macos/Pods/
+frontends/**/android/
+development/flutter/

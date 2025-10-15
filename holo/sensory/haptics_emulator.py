@@ -35,10 +35,10 @@ class HapticsEmulator:
     that can be used with various haptic feedback devices.
     """
     
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the haptics emulator."""
-        self.patterns = self._initialize_patterns()
-        self.custom_patterns = {}
+        self.patterns: Dict[str, Dict[str, Any]] = self._initialize_patterns()
+        self.custom_patterns: Dict[str, Dict[str, Any]] = {}
         
     def _initialize_patterns(self) -> Dict[str, Dict[str, Any]]:
         """
@@ -228,7 +228,7 @@ class HapticsEmulator:
         """
         emotion = emotion.lower()
         
-        emotion_patterns = {
+        emotion_patterns: Dict[str, Dict[str, Any]] = {
             "happy": {
                 "base_pattern": HapticPattern.GENTLE_PULSE.value,
                 "intensity_multiplier": 1.2
@@ -276,8 +276,16 @@ class HapticsEmulator:
             base_pattern["events"] = adjusted_events
             base_pattern["name"] = f"{emotion}_pattern"
             base_pattern["description"] = f"Haptic pattern for {emotion} emotion"
-        
-        return base_pattern
+            return base_pattern
+        else:
+            # Return a default pattern if base pattern not found
+            return {
+                "name": f"{emotion}_pattern",
+                "description": f"Default haptic pattern for {emotion} emotion",
+                "events": [{"time": 0, "intensity": intensity, "duration": 100}],
+                "repeat": False,
+                "repeat_interval": 0
+            }
     
     def get_all_patterns(self) -> Dict[str, Any]:
         """

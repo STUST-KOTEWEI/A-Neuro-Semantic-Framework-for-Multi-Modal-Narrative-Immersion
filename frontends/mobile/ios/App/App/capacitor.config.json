@@ -1,0 +1,12 @@
+{
+	"appId": "com.stust.ai_reader",
+	"appName": "AI Reader",
+	"webDir": "web",
+	"server": {
+		"androidScheme": "https"
+	},
+	"ios": {
+		"contentInset": "always"
+	},
+	"packageClassList": []
+}

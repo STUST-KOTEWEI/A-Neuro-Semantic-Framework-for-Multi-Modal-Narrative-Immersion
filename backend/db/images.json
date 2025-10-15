@@ -1,0 +1,802 @@
+[
+  {
+    "id": "img001",
+    "emotion": "happy",
+    "url": "/static/images/happy_01.png",
+    "description": "A bright sunny meadow with colorful wildflowers swaying in a gentle breeze",
+    "tags": ["nature", "bright", "peaceful", "cheerful"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img002",
+    "emotion": "happy",
+    "url": "/static/images/happy_02.png",
+    "description": "Children laughing and playing in a playground under golden sunlight",
+    "tags": ["joy", "childhood", "warmth", "playful"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img003",
+    "emotion": "sad",
+    "url": "/static/images/sad_01.png",
+    "description": "Rain drops sliding down a window pane with blurred city lights in the background",
+    "tags": ["melancholy", "rain", "loneliness", "contemplative"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img004",
+    "emotion": "sad",
+    "url": "/static/images/sad_02.png",
+    "description": "An empty park bench under a weeping willow tree in autumn",
+    "tags": ["solitude", "autumn", "nostalgic", "quiet"],
+    "intensity": 0.6
+  },
+  {
+    "id": "img005",
+    "emotion": "fear",
+    "url": "/static/images/fear_01.png",
+    "description": "A dark forest path with twisted tree branches creating eerie shadows",
+    "tags": ["darkness", "mysterious", "ominous", "suspense"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img006",
+    "emotion": "fear",
+    "url": "/static/images/fear_02.png",
+    "description": "An old abandoned house with broken windows during a stormy night",
+    "tags": ["haunted", "storm", "abandonment", "thriller"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img007",
+    "emotion": "anger",
+    "url": "/static/images/anger_01.png",
+    "description": "Lightning striking across a dark red sky with storm clouds",
+    "tags": ["storm", "lightning", "fierce", "intensity"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img008",
+    "emotion": "anger",
+    "url": "/static/images/anger_02.png",
+    "description": "A raging fire consuming dry grassland under a smoke-filled sky",
+    "tags": ["fire", "destruction", "power", "chaos"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img009",
+    "emotion": "surprise",
+    "url": "/static/images/surprise_01.png",
+    "description": "A sudden burst of colorful fireworks lighting up the night sky",
+    "tags": ["fireworks", "explosion", "celebration", "wonder"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img010",
+    "emotion": "surprise",
+    "url": "/static/images/surprise_02.png",
+    "description": "A beautiful aurora borealis dancing across the polar night",
+    "tags": ["aurora", "magical", "cosmic", "breathtaking"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img011",
+    "emotion": "disgust",
+    "url": "/static/images/disgust_01.png",
+    "description": "A polluted swamp with murky green water and dead vegetation",
+    "tags": ["pollution", "decay", "contamination", "unpleasant"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img012",
+    "emotion": "disgust",
+    "url": "/static/images/disgust_02.png",
+    "description": "An abandoned garbage dump with rusted metal and toxic waste",
+    "tags": ["waste", "toxic", "abandoned", "repulsive"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img013",
+    "emotion": "calm",
+    "url": "/static/images/calm_01.png",
+    "description": "A serene lake reflecting mountains at sunrise with perfect stillness",
+    "tags": ["lake", "reflection", "mountains", "tranquil"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img014",
+    "emotion": "calm",
+    "url": "/static/images/calm_02.png",
+    "description": "A zen garden with carefully raked sand patterns and smooth stones",
+    "tags": ["zen", "meditation", "minimalist", "peaceful"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img015",
+    "emotion": "excitement",
+    "url": "/static/images/excitement_01.png",
+    "description": "A roller coaster at the peak moment with people's hands raised high",
+    "tags": ["adventure", "thrill", "motion", "adrenaline"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img016",
+    "emotion": "excitement",
+    "url": "/static/images/excitement_02.png",
+    "description": "A sports stadium filled with cheering crowds under bright lights",
+    "tags": ["sports", "crowd", "energy", "celebration"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img017",
+    "emotion": "love",
+    "url": "/static/images/love_01.png",
+    "description": "Two people holding hands while watching a romantic sunset on the beach",
+    "tags": ["romance", "sunset", "beach", "connection"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img018",
+    "emotion": "love",
+    "url": "/static/images/love_02.png",
+    "description": "A heart-shaped formation of red roses in a beautiful garden",
+    "tags": ["roses", "heart", "garden", "romantic"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img019",
+    "emotion": "curiosity",
+    "url": "/static/images/curiosity_01.png",
+    "description": "An ancient library with towering bookshelves and mysterious glowing books",
+    "tags": ["library", "books", "knowledge", "mystery"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img020",
+    "emotion": "curiosity",
+    "url": "/static/images/curiosity_02.png",
+    "description": "A telescope pointing towards a star-filled sky with distant galaxies",
+    "tags": ["telescope", "stars", "space", "exploration"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img021",
+    "emotion": "happy",
+    "url": "/static/images/happy_03.png",
+    "description": "A golden retriever running joyfully through a field of sunflowers",
+    "tags": ["dog", "sunflowers", "running", "joyful"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img022",
+    "emotion": "happy",
+    "url": "/static/images/happy_04.png",
+    "description": "A birthday party with colorful balloons and a smiling child blowing candles",
+    "tags": ["birthday", "balloons", "celebration", "childhood"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img023",
+    "emotion": "sad",
+    "url": "/static/images/sad_03.png",
+    "description": "A lone person sitting on a pier, looking out at a grey ocean",
+    "tags": ["loneliness", "pier", "ocean", "contemplation"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img024",
+    "emotion": "sad",
+    "url": "/static/images/sad_04.png",
+    "description": "Wilted flowers in a vase by a window with soft, diffused light",
+    "tags": ["wilted", "flowers", "window", "melancholy"],
+    "intensity": 0.6
+  },
+  {
+    "id": "img025",
+    "emotion": "fear",
+    "url": "/static/images/fear_03.png",
+    "description": "A narrow alleyway at night with flickering streetlights and long shadows",
+    "tags": ["alley", "night", "shadows", "urban"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img026",
+    "emotion": "fear",
+    "url": "/static/images/fear_04.png",
+    "description": "A spider web covered in morning dew with a large spider in the center",
+    "tags": ["spider", "web", "dew", "nature"],
+    "intensity": 0.6
+  },
+  {
+    "id": "img027",
+    "emotion": "anger",
+    "url": "/static/images/anger_03.png",
+    "description": "A volcanic eruption with lava flowing down rocky slopes",
+    "tags": ["volcano", "lava", "eruption", "powerful"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img028",
+    "emotion": "anger",
+    "url": "/static/images/anger_04.png",
+    "description": "A fierce tornado swirling across a barren landscape",
+    "tags": ["tornado", "wind", "destruction", "force"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img029",
+    "emotion": "surprise",
+    "url": "/static/images/surprise_03.png",
+    "description": "A magician's hat with a white rabbit emerging in a puff of smoke",
+    "tags": ["magic", "rabbit", "hat", "illusion"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img030",
+    "emotion": "surprise",
+    "url": "/static/images/surprise_04.png",
+    "description": "A field of cherry blossoms suddenly blooming in spring",
+    "tags": ["cherry", "blossoms", "spring", "bloom"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img031",
+    "emotion": "disgust",
+    "url": "/static/images/disgust_03.png",
+    "description": "Moldy bread with green fuzzy spores growing on its surface",
+    "tags": ["mold", "bread", "decay", "fungus"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img032",
+    "emotion": "disgust",
+    "url": "/static/images/disgust_04.png",
+    "description": "A sewer grate with murky water and unpleasant debris",
+    "tags": ["sewer", "murky", "debris", "urban"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img033",
+    "emotion": "calm",
+    "url": "/static/images/calm_03.png",
+    "description": "A meditation room with soft cushions and gentle candlelight",
+    "tags": ["meditation", "cushions", "candles", "peaceful"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img034",
+    "emotion": "calm",
+    "url": "/static/images/calm_04.png",
+    "description": "A gentle stream flowing through a moss-covered forest",
+    "tags": ["stream", "moss", "forest", "flowing"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img035",
+    "emotion": "excitement",
+    "url": "/static/images/excitement_03.png",
+    "description": "A concert stage with bright lights and energetic performers",
+    "tags": ["concert", "stage", "lights", "performance"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img036",
+    "emotion": "excitement",
+    "url": "/static/images/excitement_04.png",
+    "description": "A race car speeding around a track with motion blur",
+    "tags": ["race", "speed", "track", "motion"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img037",
+    "emotion": "love",
+    "url": "/static/images/love_03.png",
+    "description": "A mother bird feeding her baby chicks in a cozy nest",
+    "tags": ["mother", "bird", "chicks", "nest"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img038",
+    "emotion": "love",
+    "url": "/static/images/love_04.png",
+    "description": "An elderly couple dancing together in their living room",
+    "tags": ["elderly", "couple", "dancing", "home"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img039",
+    "emotion": "curiosity",
+    "url": "/static/images/curiosity_03.png",
+    "description": "A scientist examining a specimen under a microscope",
+    "tags": ["scientist", "microscope", "research", "discovery"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img040",
+    "emotion": "curiosity",
+    "url": "/static/images/curiosity_04.png",
+    "description": "An archaeologist carefully brushing dirt from an ancient artifact",
+    "tags": ["archaeologist", "artifact", "excavation", "history"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img041",
+    "emotion": "happy",
+    "url": "/static/images/happy_05.png",
+    "description": "A graduation ceremony with students throwing caps in the air",
+    "tags": ["graduation", "celebration", "achievement", "students"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img042",
+    "emotion": "happy",
+    "url": "/static/images/happy_06.png",
+    "description": "A family picnic in a park with everyone laughing and sharing food",
+    "tags": ["family", "picnic", "park", "sharing"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img043",
+    "emotion": "sad",
+    "url": "/static/images/sad_05.png",
+    "description": "An empty swing moving gently in the wind in an abandoned playground",
+    "tags": ["swing", "empty", "abandoned", "playground"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img044",
+    "emotion": "sad",
+    "url": "/static/images/sad_06.png",
+    "description": "A single tear drop on a cheek caught in soft natural light",
+    "tags": ["tear", "emotion", "sadness", "portrait"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img045",
+    "emotion": "fear",
+    "url": "/static/images/fear_05.png",
+    "description": "A creaky wooden staircase leading up into darkness",
+    "tags": ["stairs", "darkness", "creaky", "mysterious"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img046",
+    "emotion": "fear",
+    "url": "/static/images/fear_06.png",
+    "description": "Eyes peering through a crack in a wooden door",
+    "tags": ["eyes", "door", "crack", "watching"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img047",
+    "emotion": "anger",
+    "url": "/static/images/anger_05.png",
+    "description": "A clenched fist against a red background with dramatic lighting",
+    "tags": ["fist", "red", "dramatic", "tension"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img048",
+    "emotion": "anger",
+    "url": "/static/images/anger_06.png",
+    "description": "Shattered glass reflecting harsh light with sharp fragments",
+    "tags": ["glass", "shattered", "sharp", "destruction"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img049",
+    "emotion": "surprise",
+    "url": "/static/images/surprise_05.png",
+    "description": "A jack-in-the-box popping out with a colorful explosion",
+    "tags": ["jack-in-the-box", "surprise", "colorful", "pop"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img050",
+    "emotion": "surprise",
+    "url": "/static/images/surprise_06.png",
+    "description": "A surprise party with people jumping out from behind furniture",
+    "tags": ["party", "surprise", "friends", "celebration"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img051",
+    "emotion": "disgust",
+    "url": "/static/images/disgust_05.png",
+    "description": "A stagnant pond covered with green algae and dead fish",
+    "tags": ["pond", "algae", "stagnant", "death"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img052",
+    "emotion": "disgust",
+    "url": "/static/images/disgust_06.png",
+    "description": "Overflowing garbage bins with flies swarming around",
+    "tags": ["garbage", "flies", "overflow", "unsanitary"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img053",
+    "emotion": "calm",
+    "url": "/static/images/calm_05.png",
+    "description": "A sleeping cat curled up in a sunbeam by the window",
+    "tags": ["cat", "sleeping", "sunbeam", "peaceful"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img054",
+    "emotion": "calm",
+    "url": "/static/images/calm_06.png",
+    "description": "Wind chimes hanging from a porch in gentle summer breeze",
+    "tags": ["wind chimes", "porch", "breeze", "gentle"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img055",
+    "emotion": "excitement",
+    "url": "/static/images/excitement_05.png",
+    "description": "A skydiver free-falling through clouds with arms spread wide",
+    "tags": ["skydiving", "clouds", "freedom", "adventure"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img056",
+    "emotion": "excitement",
+    "url": "/static/images/excitement_06.png",
+    "description": "A carnival with spinning rides and bright neon lights at night",
+    "tags": ["carnival", "rides", "neon", "night"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img057",
+    "emotion": "love",
+    "url": "/static/images/love_05.png",
+    "description": "A wedding couple exchanging rings under a flower arch",
+    "tags": ["wedding", "rings", "flowers", "ceremony"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img058",
+    "emotion": "love",
+    "url": "/static/images/love_06.png",
+    "description": "A handwritten love letter with a red rose beside it",
+    "tags": ["letter", "rose", "handwritten", "romantic"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img059",
+    "emotion": "curiosity",
+    "url": "/static/images/curiosity_05.png",
+    "description": "A child looking through a magnifying glass at a butterfly",
+    "tags": ["child", "magnifying glass", "butterfly", "wonder"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img060",
+    "emotion": "curiosity",
+    "url": "/static/images/curiosity_06.png",
+    "description": "An explorer with a map standing at the entrance of a mysterious cave",
+    "tags": ["explorer", "map", "cave", "adventure"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img061",
+    "emotion": "peaceful",
+    "url": "/static/images/peaceful_01.png",
+    "description": "A monastery garden with stone paths and blooming lotus flowers",
+    "tags": ["monastery", "garden", "lotus", "spiritual"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img062",
+    "emotion": "peaceful",
+    "url": "/static/images/peaceful_02.png",
+    "description": "Snow falling gently on a quiet village at twilight",
+    "tags": ["snow", "village", "twilight", "quiet"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img063",
+    "emotion": "nostalgic",
+    "url": "/static/images/nostalgic_01.png",
+    "description": "An old wooden rocking chair on a farmhouse porch",
+    "tags": ["rocking chair", "farmhouse", "porch", "memory"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img064",
+    "emotion": "nostalgic",
+    "url": "/static/images/nostalgic_02.png",
+    "description": "Vintage photographs scattered on an antique wooden table",
+    "tags": ["vintage", "photographs", "antique", "memories"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img065",
+    "emotion": "mysterious",
+    "url": "/static/images/mysterious_01.png",
+    "description": "A fog-covered bridge disappearing into the mist",
+    "tags": ["fog", "bridge", "mist", "unknown"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img066",
+    "emotion": "mysterious",
+    "url": "/static/images/mysterious_02.png",
+    "description": "An ancient key lying on a weathered map with cryptic symbols",
+    "tags": ["key", "map", "symbols", "ancient"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img067",
+    "emotion": "hope",
+    "url": "/static/images/hope_01.png",
+    "description": "A single green sprout growing through a crack in concrete",
+    "tags": ["sprout", "concrete", "growth", "persistence"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img068",
+    "emotion": "hope",
+    "url": "/static/images/hope_02.png",
+    "description": "A lighthouse beam cutting through storm clouds at dawn",
+    "tags": ["lighthouse", "storm", "dawn", "guidance"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img069",
+    "emotion": "wonder",
+    "url": "/static/images/wonder_01.png",
+    "description": "A child's hands cupping fireflies on a summer evening",
+    "tags": ["fireflies", "child", "summer", "magic"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img070",
+    "emotion": "wonder",
+    "url": "/static/images/wonder_02.png",
+    "description": "A whale breaching the ocean surface under a rainbow",
+    "tags": ["whale", "ocean", "rainbow", "majestic"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img071",
+    "emotion": "melancholy",
+    "url": "/static/images/melancholy_01.png",
+    "description": "A train station at sunset with no people on the platform",
+    "tags": ["train station", "sunset", "empty", "waiting"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img072",
+    "emotion": "melancholy",
+    "url": "/static/images/melancholy_02.png",
+    "description": "Sheet music pages scattered by the wind near an open window",
+    "tags": ["sheet music", "wind", "window", "abandoned"],
+    "intensity": 0.6
+  },
+  {
+    "id": "img073",
+    "emotion": "triumph",
+    "url": "/static/images/triumph_01.png",
+    "description": "A mountain climber reaching the summit with arms raised high",
+    "tags": ["mountain", "summit", "achievement", "victory"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img074",
+    "emotion": "triumph",
+    "url": "/static/images/triumph_02.png",
+    "description": "A chess player making the winning move with focused determination",
+    "tags": ["chess", "victory", "strategy", "focus"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img075",
+    "emotion": "serenity",
+    "url": "/static/images/serenity_01.png",
+    "description": "Floating tea lights on a still pond at dusk",
+    "tags": ["tea lights", "pond", "dusk", "floating"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img076",
+    "emotion": "serenity",
+    "url": "/static/images/serenity_02.png",
+    "description": "A person in yoga pose silhouetted against the sunrise",
+    "tags": ["yoga", "silhouette", "sunrise", "meditation"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img077",
+    "emotion": "anxiety",
+    "url": "/static/images/anxiety_01.png",
+    "description": "Clock hands spinning rapidly in a blur of motion",
+    "tags": ["clock", "time", "spinning", "pressure"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img078",
+    "emotion": "anxiety",
+    "url": "/static/images/anxiety_02.png",
+    "description": "A maze viewed from above with multiple confusing pathways",
+    "tags": ["maze", "confusion", "paths", "lost"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img079",
+    "emotion": "relief",
+    "url": "/static/images/relief_01.png",
+    "description": "Rain clouds parting to reveal warm sunshine",
+    "tags": ["clouds", "sunshine", "clearing", "breakthrough"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img080",
+    "emotion": "relief",
+    "url": "/static/images/relief_02.png",
+    "description": "A person taking off heavy boots after a long journey",
+    "tags": ["boots", "journey", "rest", "completion"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img081",
+    "emotion": "gratitude",
+    "url": "/static/images/gratitude_01.png",
+    "description": "Hands holding a small sapling with rich soil",
+    "tags": ["hands", "sapling", "soil", "nurturing"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img082",
+    "emotion": "gratitude",
+    "url": "/static/images/gratitude_02.png",
+    "description": "A thankful prayer hands gesture silhouetted against candlelight",
+    "tags": ["prayer", "hands", "candle", "spiritual"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img083",
+    "emotion": "determination",
+    "url": "/static/images/determination_01.png",
+    "description": "A runner pushing through the finish line tape",
+    "tags": ["runner", "finish line", "perseverance", "achievement"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img084",
+    "emotion": "determination",
+    "url": "/static/images/determination_02.png",
+    "description": "A student studying late at night surrounded by books",
+    "tags": ["student", "books", "night", "dedication"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img085",
+    "emotion": "confusion",
+    "url": "/static/images/confusion_01.png",
+    "description": "Multiple road signs pointing in different directions",
+    "tags": ["signs", "directions", "crossroads", "choice"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img086",
+    "emotion": "confusion",
+    "url": "/static/images/confusion_02.png",
+    "description": "A jigsaw puzzle with missing pieces scattered around",
+    "tags": ["puzzle", "pieces", "incomplete", "solving"],
+    "intensity": 0.6
+  },
+  {
+    "id": "img087",
+    "emotion": "awe",
+    "url": "/static/images/awe_01.png",
+    "description": "A vast cathedral interior with light streaming through stained glass",
+    "tags": ["cathedral", "stained glass", "light", "sacred"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img088",
+    "emotion": "awe",
+    "url": "/static/images/awe_02.png",
+    "description": "The Milky Way galaxy visible in a clear night sky",
+    "tags": ["milky way", "galaxy", "night sky", "cosmic"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img089",
+    "emotion": "contentment",
+    "url": "/static/images/contentment_01.png",
+    "description": "An elderly person reading a book by a fireplace",
+    "tags": ["reading", "fireplace", "elderly", "comfort"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img090",
+    "emotion": "contentment",
+    "url": "/static/images/contentment_02.png",
+    "description": "A warm cup of tea steaming on a windowsill during rain",
+    "tags": ["tea", "windowsill", "rain", "warmth"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img091",
+    "emotion": "anticipation",
+    "url": "/static/images/anticipation_01.png",
+    "description": "A closed gift box with a beautiful ribbon waiting to be opened",
+    "tags": ["gift", "box", "ribbon", "waiting"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img092",
+    "emotion": "anticipation",
+    "url": "/static/images/anticipation_02.png",
+    "description": "A theater curtain about to rise with audience silhouettes",
+    "tags": ["theater", "curtain", "audience", "performance"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img093",
+    "emotion": "pride",
+    "url": "/static/images/pride_01.png",
+    "description": "A parent watching their child take first steps",
+    "tags": ["parent", "child", "first steps", "milestone"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img094",
+    "emotion": "pride",
+    "url": "/static/images/pride_02.png",
+    "description": "An artist standing back to admire their completed masterpiece",
+    "tags": ["artist", "masterpiece", "completion", "creation"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img095",
+    "emotion": "longing",
+    "url": "/static/images/longing_01.png",
+    "description": "A person looking out at the horizon from a ship's deck",
+    "tags": ["horizon", "ship", "ocean", "distance"],
+    "intensity": 0.7
+  },
+  {
+    "id": "img096",
+    "emotion": "longing",
+    "url": "/static/images/longing_02.png",
+    "description": "An empty rocking chair on a porch with a view of the countryside",
+    "tags": ["rocking chair", "porch", "countryside", "waiting"],
+    "intensity": 0.6
+  },
+  {
+    "id": "img097",
+    "emotion": "joy",
+    "url": "/static/images/joy_01.png",
+    "description": "Confetti falling during a celebration with people dancing",
+    "tags": ["confetti", "celebration", "dancing", "festive"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img098",
+    "emotion": "joy",
+    "url": "/static/images/joy_02.png",
+    "description": "A field of dandelions with seeds blowing in the wind",
+    "tags": ["dandelions", "seeds", "wind", "freedom"],
+    "intensity": 0.8
+  },
+  {
+    "id": "img099",
+    "emotion": "tranquility",
+    "url": "/static/images/tranquility_01.png",
+    "description": "A Japanese rock garden with perfectly placed stones and sand",
+    "tags": ["rock garden", "stones", "sand", "zen"],
+    "intensity": 0.9
+  },
+  {
+    "id": "img100",
+    "emotion": "tranquility",
+    "url": "/static/images/tranquility_02.png",
+    "description": "A hammock swaying gently between two palm trees by the beach",
+    "tags": ["hammock", "palm trees", "beach", "relaxation"],
+    "intensity": 0.8
+  }
+]

@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多感官沉浸式閱讀器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .main-container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        /* 頂部控制區 */
+        .top-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .control-panel {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .control-panel h2 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 鏡頭區域 */
+        #videoElement {
+            width: 100%;
+            height: 200px;
+            background: #000;
+            border-radius: 10px;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+
+        .emotion-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border-radius: 20px;
+            font-weight: 600;
+            margin: 5px;
+        }
+
+        /* 語音控制 */
+        .voice-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #fff;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #eb3349, #f45c43);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f2994a, #f2c94c);
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 設備連接區 */
+        .devices-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .device-card {
+            background: rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .device-card:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .device-card.connected {
+            border-color: #38ef7d;
+            background: rgba(56, 239, 125, 0.2);
+        }
+
+        .device-icon {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .device-name {
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        /* 主內容區 */
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* 圖像輪播區 */
+        .image-carousel {
+            background: rgba(0,0,0,0.5);
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            min-height: 500px;
+        }
+
+        .carousel-image {
+            width: 100%;
+            height: 450px;
+            object-fit: cover;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .carousel-image.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .carousel-controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .carousel-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .carousel-dot.active {
+            background: #fff;
+            width: 30px;
+            border-radius: 6px;
+        }
+
+        .carousel-info {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            right: 30px;
+            background: rgba(0,0,0,0.7);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        /* 功能面板 */
+        .features-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .feature-btn {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .feature-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(5px);
+        }
+
+        .feature-btn.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .feature-label {
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        /* 音訊播放器 */
+        .audio-player {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .audio-player.active {
+            display: block;
+        }
+
+        audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* 數據展示區 */
+        .data-display {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .data-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .data-item h4 {
+            margin-bottom: 8px;
+            color: #f2c94c;
+        }
+
+        /* 狀態指示器 */
+        .status-bar {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .status-item {
+            text-align: center;
+        }
+
+        .status-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .status-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .recording-indicator {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: rgba(235, 51, 73, 0.8);
+            border-radius: 20px;
+            margin-top: 10px;
+        }
+
+        .recording-indicator.active {
+            display: flex;
+        }
+
+        .recording-dot {
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* 聊天小掛件 */
+        .chat-widget {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 340px;
+            max-height: 60vh;
+            background: rgba(0,0,0,0.75);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+            display: none;
+            flex-direction: column;
+        }
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        .chat-body {
+            padding: 10px;
+            overflow-y: auto;
+            min-height: 200px;
+        }
+        .chat-input {
+            display: flex;
+            gap: 6px;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+        }
+        .chat-msg { margin-bottom: 8px; }
+        .chat-msg.user { text-align: right; }
+        .chat-toggle-btn {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+        }
+
+        /* 捲軸樣式 */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h1>🌈 多感官沉浸式閱讀器</h1>
+        <p class="subtitle">情緒感知 × RAG生成 × 語音交互 × 多設備傳導</p>
+
+        <!-- 頂部控制區 -->
+        <div class="top-controls">
+            <!-- 鏡頭與情緒檢測 -->
+            <div class="control-panel">
+                <h2>📷 情緒檢測</h2>
+                <video id="videoElement" autoplay playsinline></video>
+                <canvas id="capturedCanvas" style="display:none;"></canvas>
+                
+                <div class="voice-controls">
+                    <button class="btn btn-primary" id="startCameraBtn">啟動鏡頭</button>
+                    <button class="btn btn-success" id="detectEmotionBtn" disabled>檢測情緒</button>
+                </div>
+                
+                <div id="emotionDisplay">
+                    <span class="emotion-badge" id="currentEmotion">未檢測</span>
+                    <span class="emotion-badge" id="emotionIntensity">強度: 0%</span>
+                </div>
+            </div>
+
+            <!-- 語音控制 -->
+            <div class="control-panel">
+                <h2>🎤 語音交互</h2>
+                
+                <div class="voice-controls">
+                    <button class="btn btn-danger" id="startRecordBtn">🎙️ 開始錄音</button>
+                    <button class="btn btn-warning" id="stopRecordBtn" disabled>⏹️ 停止</button>
+                </div>
+                
+                <div class="recording-indicator" id="recordingIndicator">
+                    <div class="recording-dot"></div>
+                    <span>錄音中...</span>
+                </div>
+                
+                <textarea id="ttsInput" placeholder="輸入文字，系統會朗讀..."></textarea>
+                
+                <button class="btn btn-success" id="speakBtn" style="width: 100%; margin-top: 10px;">
+                    🔊 朗讀文字 (TTS)
+                </button>
+                
+                <div class="audio-player" id="audioPlayer">
+                    <h4>🎵 語音播放</h4>
+                    <audio id="audioElement" controls></audio>
+                </div>
+            </div>
+
+            <!-- 設備連接 -->
+            <div class="control-panel">
+                <h2>📡 多感官設備</h2>
+                <div class="devices-grid">
+                    <div class="device-card" data-device="apple_watch">
+                        <div class="device-icon">⌚</div>
+                        <div class="device-name">Apple Watch</div>
+                    </div>
+                    <div class="device-card" data-device="rayban_meta">
+                        <div class="device-icon">🕶️</div>
+                        <div class="device-name">Ray-Ban Meta</div>
+                    </div>
+                    <div class="device-card" data-device="tesla_suit">
+                        <div class="device-icon">🦾</div>
+                        <div class="device-name">Tesla Suit</div>
+                    </div>
+                    <div class="device-card" data-device="bhaptics">
+                        <div class="device-icon">🎽</div>
+                        <div class="device-name">bHaptics</div>
+                    </div>
+                    <div class="device-card" data-device="aromajoin">
+                        <div class="device-icon">👃</div>
+                        <div class="device-name">Aromajoin</div>
+                    </div>
+                    <div class="device-card" data-device="foodini">
+                        <div class="device-icon">🍽️</div>
+                        <div class="device-name">Foodini</div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-success" id="broadcastBtn" style="width: 100%; margin-top: 15px;" disabled>
+                    📡 廣播到所有設備
+                </button>
+            </div>
+        </div>
+
+        <!-- 主內容區 -->
+        <div class="main-content">
+            <!-- 圖像輪播 -->
+            <div class="image-carousel">
+                <div class="carousel-info">
+                    <h3 id="carouselTitle">等待生成圖像...</h3>
+                    <p id="carouselCaption"></p>
+                </div>
+                
+                <div id="carouselImages"></div>
+                
+                <div class="carousel-controls" id="carouselControls"></div>
+                
+                <div style="position: absolute; top: 20px; right: 20px;">
+                    <button class="btn btn-primary" id="autoPlayBtn">▶️ 自動播放</button>
+                </div>
+            </div>
+
+            <!-- 功能面板 -->
+            <div class="features-panel">
+                <div class="feature-btn" data-feature="isbn">
+                    <div class="feature-icon">📚</div>
+                    <div class="feature-label">ISBN 書籍</div>
+                </div>
+                <div class="feature-btn" data-feature="podcast">
+                    <div class="feature-icon">🎙️</div>
+                    <div class="feature-label">播客內容</div>
+                </div>
+                <div class="feature-btn" data-feature="nlp">
+                    <div class="feature-icon">🧠</div>
+                    <div class="feature-label">NLP 分析</div>
+                </div>
+                <div class="feature-btn" data-feature="rag">
+                    <div class="feature-icon">🖼️</div>
+                    <div class="feature-label">RAG 圖像</div>
+                </div>
+                <div class="feature-btn" data-feature="generate">
+                    <div class="feature-icon">🚀</div>
+                    <div class="feature-label">生成內容</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 狀態欄 -->
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-value" id="statImages">0</span>
+                <span class="status-label">圖像數</span>
+            </div>
+            <div class="status-item">
+                <span class="status-value" id="statEmotion">-</span>
+                <span class="status-label">當前情緒</span>
+            </div>
+            <div class="status-item">
+                <span class="status-value" id="statDevices">0</span>
+                <span class="status-label">已連接設備</span>
+            </div>
+            <div class="status-item">
+                <span class="status-value" id="statAutoplay">關閉</span>
+                <span class="status-label">自動播放</span>
+            </div>
+        </div>
+
+        <!-- 數據展示區 -->
+        <div class="data-display" id="dataDisplay">
+            <h3>📊 數據日誌</h3>
+            <div id="dataContent"></div>
+        </div>
+    </div>
+
+    <div class="chat-toggle-btn" id="chatToggle">💬</div>
+    <div class="chat-widget" id="chatWidget">
+        <div class="chat-header">
+            <div>情緒聊天</div>
+            <button class="btn btn-danger" id="closeChat" style="padding:6px 10px;">✕</button>
+        </div>
+        <div class="chat-body" id="chatBody"></div>
+        <div class="chat-input">
+            <input id="chatInput" placeholder="輸入訊息..." style="flex:1;padding:10px;border-radius:8px;border:none;"/>
+            <button class="btn btn-success" id="chatSend" style="padding:10px 14px;">送出</button>
+        </div>
+    </div>
+
+    <script src="multisensory_reader.js"></script>
+</body>
+</html>

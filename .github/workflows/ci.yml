@@ -1,0 +1,119 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, '3.10', '3.11', '3.12']
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install black flake8 mypy pytest-cov
+    
+    - name: Lint with flake8
+      run: |
+        flake8 holo/ tests/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 holo/ tests/ --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+    
+    - name: Format check with black
+      run: |
+        black --check holo/ tests/
+    
+    - name: Type check with mypy
+      run: |
+        mypy holo/ --ignore-missing-imports
+    
+    - name: Test with pytest
+      run: |
+        pytest tests/ -v --cov=holo --cov-report=xml
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: web/frontend/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: web/frontend
+      run: npm ci
+    
+    - name: Run tests
+      working-directory: web/frontend
+      run: npm test -- --reporter=verbose --coverage
+    
+    - name: Build
+      working-directory: web/frontend
+      run: npm run build
+
+  integration-tests:
+    needs: [test-backend, test-frontend]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Install backend dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest
+    
+    - name: Install frontend dependencies
+      working-directory: web/frontend
+      run: npm ci
+    
+    - name: Run integration tests
+      run: |
+        python -m pytest tests/test_integration_e2e.py -v
+    
+    - name: Test API endpoints
+      run: |
+        # Start the backend server in background
+        cd web/backend && python main.py &
+        sleep 10
+        # Test API endpoints
+        curl -f http://localhost:8000/ || exit 1
+        curl -f -X POST http://localhost:8000/generate_immersion \
+          -H "Content-Type: application/json" \
+          -d '{"text": "Hello world!"}' || exit 1
